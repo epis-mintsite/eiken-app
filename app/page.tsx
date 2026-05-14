@@ -51,15 +51,15 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       {/* Hero section */}
-      <div className="bg-[#191919] py-16">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
+      <div className="border-b border-[#E3E2DE] py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#37352F]">
             英検準一級 ライティング添削
           </h1>
-          <p className="mt-3 text-base text-[rgba(255,255,255,0.7)]">
+          <p className="mt-2 text-sm text-[#9B9A97]">
             手書き答案の自動添削・採点システム
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
+          <div className="mt-6 flex items-center gap-3">
             <Link
               href="/upload"
               className="bg-[#6C5CE7] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
@@ -68,15 +68,15 @@ export default function DashboardPage() {
             </Link>
             <Link
               href="/batch"
-              className="border border-[rgba(255,255,255,0.3)] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:border-[rgba(255,255,255,0.5)] transition-colors"
+              className="border border-[#E3E2DE] text-[#37352F] rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-[#F7F6F3] transition-colors"
             >
               一括処理
             </Link>
           </div>
-          <div className="mt-4">
+          <div className="mt-3">
             <Link
               href="/guide"
-              className="text-sm text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+              className="text-sm text-[#2383E2] hover:underline transition-colors"
             >
               操作ガイドを見る →
             </Link>

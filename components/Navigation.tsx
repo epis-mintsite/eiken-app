@@ -42,11 +42,8 @@ export default function Navigation() {
             href="/"
             className="flex items-center gap-2 shrink-0"
           >
-            <span className="flex items-center justify-center w-6 h-6 rounded bg-[#6C5CE7] text-white text-xs font-bold">
-              N
-            </span>
-            <span className="text-[#37352F] font-bold text-base">
-              英検ライティング
+            <span className="text-[#37352F] font-semibold text-base tracking-tight">
+              英検ライティング添削
             </span>
           </Link>
 

@@ -125,12 +125,12 @@ export default function GuidePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="bg-[#191919] py-12">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white">
+      <div className="border-b border-[#E3E2DE] py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#37352F]">
             操作ガイド
           </h1>
-          <p className="mt-2 text-sm text-[rgba(255,255,255,0.7)]">
+          <p className="mt-2 text-sm text-[#9B9A97]">
             英検準一級 ライティング添削アプリの使い方
           </p>
         </div>
