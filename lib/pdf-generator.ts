@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export interface PdfInput {
   student_name: string;
@@ -13,12 +13,6 @@ export interface PdfInput {
   word_count: number;
 }
 
-declare module "jspdf" {
-  interface jsPDF {
-    autoTable: (options: Record<string, unknown>) => void;
-    lastAutoTable: { finalY: number };
-  }
-}
 
 function addWrappedText(doc: jsPDF, text: string, x: number, y: number, maxWidth: number, lineHeight: number): number {
   const lines = doc.splitTextToSize(text, maxWidth);
@@ -78,7 +72,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
   doc.text(`Total Score: ${total} / 16`, margin, y);
   y += 10;
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     head: [["Aspect", "Score", "Max"]],
     body: [
@@ -93,7 +87,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
     margin: { left: margin, right: margin },
     tableWidth: contentWidth,
   });
-  y = doc.lastAutoTable.finalY + 10;
+  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
 
   // Errors
   if (data.errors.length > 0) {
@@ -103,7 +97,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
     doc.text(`Errors (${data.errors.length})`, margin, y);
     y += 8;
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: y,
       head: [["#", "Type", "Original", "Correction"]],
       body: data.errors.map((e) => [
@@ -122,7 +116,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
       margin: { left: margin, right: margin },
       tableWidth: contentWidth,
     });
-    y = doc.lastAutoTable.finalY + 10;
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
   }
 
   // Feedback
