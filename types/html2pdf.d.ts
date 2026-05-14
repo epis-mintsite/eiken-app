@@ -10,7 +10,7 @@ declare module "html2pdf.js" {
 
   interface Html2PdfInstance {
     set(options: Html2PdfOptions): Html2PdfInstance;
-    from(element: HTMLElement | string): Html2PdfInstance;
+    from(element: HTMLElement | string, type?: string): Html2PdfInstance;
     save(): Promise<void>;
     toPdf(): Html2PdfInstance;
     output(type: string): Promise<unknown>;
