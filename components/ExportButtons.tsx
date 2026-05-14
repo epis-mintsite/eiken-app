@@ -90,18 +90,25 @@ export default function ExportButtons({ data }: Props) {
 
       const container = document.createElement("div");
       container.innerHTML = buildPdfHtml(data);
-      container.style.position = "absolute";
-      container.style.left = "-9999px";
+      container.style.position = "fixed";
       container.style.top = "0";
+      container.style.left = "0";
       container.style.width = "210mm";
+      container.style.zIndex = "-1";
+      container.style.opacity = "0";
+      container.style.pointerEvents = "none";
+      container.style.background = "white";
       document.body.appendChild(container);
+
+      // Wait for rendering
+      await new Promise((r) => setTimeout(r, 100));
 
       await html2pdf()
         .set({
           margin: [10, 10, 10, 10],
           filename: `eiken_report_${data.student_name}_${Date.now()}.pdf`,
           image: { type: "jpeg", quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+          html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 794 },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         })
