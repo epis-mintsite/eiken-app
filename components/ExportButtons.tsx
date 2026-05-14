@@ -88,34 +88,19 @@ export default function ExportButtons({ data }: Props) {
     try {
       const html2pdf = (await import("html2pdf.js")).default;
 
-      const container = document.createElement("div");
-      container.innerHTML = buildPdfHtml(data);
-      container.style.position = "fixed";
-      container.style.top = "0";
-      container.style.left = "0";
-      container.style.width = "210mm";
-      container.style.zIndex = "-1";
-      container.style.opacity = "0";
-      container.style.pointerEvents = "none";
-      container.style.background = "white";
-      document.body.appendChild(container);
-
-      // Wait for rendering
-      await new Promise((r) => setTimeout(r, 100));
+      const htmlString = buildPdfHtml(data);
 
       await html2pdf()
         .set({
           margin: [10, 10, 10, 10],
           filename: `eiken_report_${data.student_name}_${Date.now()}.pdf`,
           image: { type: "jpeg", quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 794 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         })
-        .from(container)
+        .from(htmlString, "string")
         .save();
-
-      document.body.removeChild(container);
     } catch (err) {
       setError(err instanceof Error ? err.message : "PDF生成に失敗しました");
     } finally {
