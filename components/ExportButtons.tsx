@@ -22,7 +22,7 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function buildPdfHtml(data: ExportData): string {
+function buildPrintHtml(data: ExportData): string {
   const total = data.scores.content + data.scores.organization + data.scores.vocabulary + data.scores.grammar;
   const priorityLabel = (p: string) => p === "high" ? "高" : p === "medium" ? "中" : "低";
   const priorityColor = (p: string) => p === "high" ? "#E255A1" : p === "medium" ? "#FF9800" : "#4CAF50";
@@ -31,50 +31,81 @@ function buildPdfHtml(data: ExportData): string {
     return map[t] || "#6B6B6B";
   };
 
-  return `
-<div style="font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; color: #37352F; font-size: 12px; line-height: 1.6; padding: 10px;">
-  <h1 style="font-size: 22px; font-weight: 700; margin: 0 0 8px; color: #37352F;">英検準一級 ライティング添削レポート</h1>
-  <p style="color: #6B6B6B; font-size: 13px; margin: 2px 0;">生徒名: ${escapeHtml(data.student_name)}</p>
-  <p style="color: #6B6B6B; font-size: 13px; margin: 2px 0;">語数: ${data.word_count}</p>
-  <p style="color: #6B6B6B; font-size: 13px; margin: 2px 0 16px;">TOPIC: ${escapeHtml(data.topic)}</p>
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>添削レポート - ${escapeHtml(data.student_name)}</title>
+<style>
+  @page { size: A4; margin: 18mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', Meiryo, sans-serif; color: #37352F; font-size: 11px; line-height: 1.65; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1 { font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 22px 0 10px; border-bottom: 2px solid #E3E2DE; padding-bottom: 5px; }
+  .meta { color: #6B6B6B; font-size: 12px; margin-bottom: 3px; }
+  .score-box { display: inline-block; background: #6C5CE7; color: #fff; font-size: 26px; font-weight: 700; padding: 6px 22px; border-radius: 8px; margin: 6px 0 12px; }
+  .score-box span { font-size: 15px; font-weight: 400; opacity: .8; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; }
+  th { background: #6C5CE7; color: #fff; text-align: left; padding: 7px 12px; font-size: 11px; font-weight: 600; }
+  .err-th { background: #37352F; }
+  td { padding: 6px 12px; border-bottom: 1px solid #EEEEEC; font-size: 11px; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; color: #fff; }
+  .fb { background: #F7F6F3; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; }
+  .fb-content { border-left: 4px solid #6C5CE7; }
+  .fb-org { border-left: 4px solid #4DB6AC; }
+  .fb-vocab { border-left: 4px solid #FF8C42; }
+  .fb-grammar { border-left: 4px solid #E255A1; }
+  .fb strong { display: block; margin-bottom: 3px; font-size: 12px; }
+  .model { background: #F3E8FF; border: 1px solid rgba(108,92,231,.2); border-radius: 6px; padding: 12px 14px; white-space: pre-wrap; line-height: 1.75; }
+  .advice-item { border: 1px solid #EEEEEC; border-radius: 6px; padding: 9px 12px; margin-bottom: 7px; }
+  .original { background: #FBFBFA; border-radius: 6px; padding: 12px 14px; white-space: pre-wrap; line-height: 1.75; }
+  .correction { color: #4CAF50; font-weight: 500; }
+  .strike { color: #EB5757; text-decoration: line-through; }
+  .footer { text-align: center; color: #9B9A97; font-size: 9px; margin-top: 28px; padding-top: 10px; border-top: 1px solid #EEEEEC; }
+</style>
+</head>
+<body>
+<h1>英検準一級 ライティング添削レポート</h1>
+<p class="meta">生徒名: ${escapeHtml(data.student_name)}</p>
+<p class="meta">語数: ${data.word_count}</p>
+<p class="meta">TOPIC: ${escapeHtml(data.topic)}</p>
 
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">採点結果</h2>
-  <div style="display: inline-block; background: #6C5CE7; color: white; font-size: 28px; font-weight: 700; padding: 8px 24px; border-radius: 8px; margin: 4px 0 14px;">
-    ${total} <span style="font-size: 16px; font-weight: 400; opacity: 0.8;">/ 16</span>
-  </div>
-  <table style="width: 100%; border-collapse: collapse; margin: 8px 0 16px;">
-    <tr><th style="background: #6C5CE7; color: white; text-align: left; padding: 8px 14px; font-size: 12px;">観点</th><th style="background: #6C5CE7; color: white; text-align: center; padding: 8px 14px; font-size: 12px;">スコア</th><th style="background: #6C5CE7; color: white; text-align: center; padding: 8px 14px; font-size: 12px;">満点</th></tr>
-    <tr><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC;">内容 (Content)</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center; font-weight: 600;">${data.scores.content}</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center;">4</td></tr>
-    <tr><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC;">構成 (Organization)</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center; font-weight: 600;">${data.scores.organization}</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center;">4</td></tr>
-    <tr><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC;">語彙 (Vocabulary)</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center; font-weight: 600;">${data.scores.vocabulary}</td><td style="padding: 8px 14px; border-bottom: 1px solid #EEEEEC; text-align: center;">4</td></tr>
-    <tr><td style="padding: 8px 14px;">文法 (Grammar)</td><td style="padding: 8px 14px; text-align: center; font-weight: 600;">${data.scores.grammar}</td><td style="padding: 8px 14px; text-align: center;">4</td></tr>
-  </table>
+<h2>採点結果</h2>
+<div class="score-box">${total} <span>/ 16</span></div>
+<table>
+<tr><th>観点</th><th style="text-align:center">スコア</th><th style="text-align:center">満点</th></tr>
+<tr><td>内容 (Content)</td><td style="text-align:center;font-weight:600">${data.scores.content}</td><td style="text-align:center">4</td></tr>
+<tr><td>構成 (Organization)</td><td style="text-align:center;font-weight:600">${data.scores.organization}</td><td style="text-align:center">4</td></tr>
+<tr><td>語彙 (Vocabulary)</td><td style="text-align:center;font-weight:600">${data.scores.vocabulary}</td><td style="text-align:center">4</td></tr>
+<tr><td>文法 (Grammar)</td><td style="text-align:center;font-weight:600">${data.scores.grammar}</td><td style="text-align:center">4</td></tr>
+</table>
 
-  ${data.errors.length > 0 ? `
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">エラーリスト（${data.errors.length}件）</h2>
-  <table style="width: 100%; border-collapse: collapse; margin: 8px 0 16px;">
-    <tr><th style="background: #37352F; color: white; text-align: left; padding: 8px 12px; font-size: 11px;">#</th><th style="background: #37352F; color: white; text-align: left; padding: 8px 12px; font-size: 11px;">タイプ</th><th style="background: #37352F; color: white; text-align: left; padding: 8px 12px; font-size: 11px;">原文</th><th style="background: #37352F; color: white; text-align: left; padding: 8px 12px; font-size: 11px;">修正案</th></tr>
-    ${data.errors.map(e => `<tr><td style="padding: 7px 12px; border-bottom: 1px solid #EEEEEC;">${e.id}</td><td style="padding: 7px 12px; border-bottom: 1px solid #EEEEEC;"><span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; color: white; background: ${typeColor(e.type)};">${escapeHtml(e.type)}</span></td><td style="padding: 7px 12px; border-bottom: 1px solid #EEEEEC; color: #EB5757; text-decoration: line-through;">${escapeHtml(e.original)}</td><td style="padding: 7px 12px; border-bottom: 1px solid #EEEEEC; color: #4CAF50; font-weight: 500;">${escapeHtml(e.correction)}</td></tr>`).join("")}
-  </table>` : ""}
+${data.errors.length > 0 ? `
+<h2>エラーリスト（${data.errors.length}件）</h2>
+<table>
+<tr><th class="err-th">#</th><th class="err-th">タイプ</th><th class="err-th">原文</th><th class="err-th">修正案</th></tr>
+${data.errors.map(e => `<tr><td>${e.id}</td><td><span class="badge" style="background:${typeColor(e.type)}">${escapeHtml(e.type)}</span></td><td class="strike">${escapeHtml(e.original)}</td><td class="correction">${escapeHtml(e.correction)}</td></tr>`).join("")}
+</table>` : ""}
 
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">4観点別 講評</h2>
-  <div style="background: #F7F6F3; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; border-left: 4px solid #6C5CE7;"><strong>内容</strong><p style="margin: 4px 0 0;">${escapeHtml(data.feedback.content)}</p></div>
-  <div style="background: #F7F6F3; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; border-left: 4px solid #4DB6AC;"><strong>構成</strong><p style="margin: 4px 0 0;">${escapeHtml(data.feedback.organization)}</p></div>
-  <div style="background: #F7F6F3; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; border-left: 4px solid #FF8C42;"><strong>語彙</strong><p style="margin: 4px 0 0;">${escapeHtml(data.feedback.vocabulary)}</p></div>
-  <div style="background: #F7F6F3; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; border-left: 4px solid #E255A1;"><strong>文法</strong><p style="margin: 4px 0 0;">${escapeHtml(data.feedback.grammar)}</p></div>
+<h2>4観点別 講評</h2>
+<div class="fb fb-content"><strong>内容</strong>${escapeHtml(data.feedback.content)}</div>
+<div class="fb fb-org"><strong>構成</strong>${escapeHtml(data.feedback.organization)}</div>
+<div class="fb fb-vocab"><strong>語彙</strong>${escapeHtml(data.feedback.vocabulary)}</div>
+<div class="fb fb-grammar"><strong>文法</strong>${escapeHtml(data.feedback.grammar)}</div>
 
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">模範答案</h2>
-  <div style="background: #F3E8FF; border: 1px solid rgba(108,92,231,0.2); border-radius: 8px; padding: 14px 16px; white-space: pre-wrap; font-size: 12px; line-height: 1.7;">${escapeHtml(data.model_essay)}</div>
+<h2>模範答案</h2>
+<div class="model">${escapeHtml(data.model_essay)}</div>
 
-  ${data.advice.length > 0 ? `
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">学習アドバイス</h2>
-  ${data.advice.map(a => `<div style="border: 1px solid #EEEEEC; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px;"><span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; color: white; background: ${priorityColor(a.priority)};">優先度: ${priorityLabel(a.priority)}</span> <strong>${escapeHtml(a.title)}</strong><p style="margin: 4px 0 0;">${escapeHtml(a.body)}</p></div>`).join("")}` : ""}
+${data.advice.length > 0 ? `
+<h2>学習アドバイス</h2>
+${data.advice.map(a => `<div class="advice-item"><span class="badge" style="background:${priorityColor(a.priority)}">優先度: ${priorityLabel(a.priority)}</span> <strong style="display:inline;margin-left:6px">${escapeHtml(a.title)}</strong><p style="margin:4px 0 0">${escapeHtml(a.body)}</p></div>`).join("")}` : ""}
 
-  <h2 style="font-size: 17px; font-weight: 600; margin: 20px 0 10px; color: #37352F; border-bottom: 2px solid #E3E2DE; padding-bottom: 6px;">原文</h2>
-  <div style="background: #FBFBFA; border-radius: 8px; padding: 14px 16px; white-space: pre-wrap; font-size: 12px; line-height: 1.7;">${escapeHtml(data.original_text)}</div>
+<h2>原文</h2>
+<div class="original">${escapeHtml(data.original_text)}</div>
 
-  <div style="text-align: center; color: #9B9A97; font-size: 10px; margin-top: 24px; padding-top: 12px; border-top: 1px solid #EEEEEC;">英検準一級 ライティング添削レポート — 自動生成</div>
-</div>`;
+<div class="footer">英検準一級 ライティング添削レポート — 自動生成</div>
+</body>
+</html>`;
 }
 
 export default function ExportButtons({ data }: Props) {
@@ -82,28 +113,26 @@ export default function ExportButtons({ data }: Props) {
   const [docxLoading, setDocxLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handlePdfDownload() {
+  function handlePdfDownload() {
     setPdfLoading(true);
     setError("");
     try {
-      const html2pdf = (await import("html2pdf.js")).default;
+      const html = buildPrintHtml(data);
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        throw new Error("ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。");
+      }
+      printWindow.document.write(html);
+      printWindow.document.close();
 
-      const htmlString = buildPdfHtml(data);
-
-      await html2pdf()
-        .set({
-          margin: [10, 10, 10, 10],
-          filename: `eiken_report_${data.student_name}_${Date.now()}.pdf`,
-          image: { type: "jpeg", quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, logging: false },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-        })
-        .from(htmlString, "string")
-        .save();
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+          setPdfLoading(false);
+        }, 300);
+      };
     } catch (err) {
-      setError(err instanceof Error ? err.message : "PDF生成に失敗しました");
-    } finally {
+      setError(err instanceof Error ? err.message : "エラーが発生しました");
       setPdfLoading(false);
     }
   }
@@ -175,6 +204,9 @@ export default function ExportButtons({ data }: Props) {
           Word ダウンロード
         </button>
       </div>
+      <p className="mt-3 text-xs text-[#9B9A97]">
+        PDF: 印刷ダイアログで「PDFとして保存」を選択してください
+      </p>
       {error && (
         <p className="mt-3 text-sm text-[#EB5757]">{error}</p>
       )}
