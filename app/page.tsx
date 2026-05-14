@@ -73,6 +73,14 @@ export default function DashboardPage() {
               一括処理
             </Link>
           </div>
+          <div className="mt-4">
+            <Link
+              href="/guide"
+              className="text-sm text-[rgba(255,255,255,0.6)] hover:text-white transition-colors"
+            >
+              操作ガイドを見る →
+            </Link>
+          </div>
         </div>
       </div>
 
