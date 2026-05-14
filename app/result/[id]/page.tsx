@@ -65,10 +65,10 @@ export default function ResultPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto" />
-          <p className="text-gray-500">結果を読み込み中...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-[#6C5CE7] border-t-transparent rounded-full mx-auto" />
+          <p className="text-sm text-[#9B9A97]">結果を読み込み中...</p>
         </div>
       </div>
     );
@@ -76,12 +76,12 @@ export default function ResultPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-3">
-          <p className="text-red-600">{error || "結果が見つかりません"}</p>
+          <p className="text-sm text-[#EB5757]">{error || "結果が見つかりません"}</p>
           <button
             onClick={() => router.push("/upload")}
-            className="text-blue-600 underline"
+            className="text-sm text-[#2383E2] underline"
           >
             アップロード画面に戻る
           </button>
@@ -91,18 +91,18 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-3xl mx-auto px-4 space-y-6">
+    <div className="min-h-screen bg-white py-12">
+      <div className="max-w-3xl mx-auto px-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">添削結果</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl font-semibold text-[#37352F]">添削結果</h1>
+            <p className="text-sm text-[#6B6B6B] mt-1">
               {data.student_name} — {data.topic}
             </p>
           </div>
           <button
             onClick={() => router.push("/upload")}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+            className="border border-[#C3C2BF] text-[#37352F] rounded-lg text-sm font-medium px-4 py-2 hover:bg-[#F7F6F3] transition-colors"
           >
             新しい添削
           </button>

@@ -1,19 +1,154 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Notion-Inspired Design System
+   ============================================================ */
+
 :root {
-  --background: #f3f4f6;
-  --foreground: #171717;
+  /* ── Primary ── */
+  --primary: #6C5CE7;
+  --primary-pressed: #5A4BD1;
+  --primary-deep: #4834D4;
+
+  /* ── Brand Navy ── */
+  --brand-navy: #191919;
+  --brand-navy-deep: #111111;
+  --brand-navy-mid: #2D2D2D;
+
+  /* ── Link Blue ── */
+  --link-blue: #2383E2;
+  --link-blue-pressed: #1B6EC2;
+
+  /* ── Brand Spectrum ── */
+  --brand-pink: #E255A1;
+  --brand-orange: #FF8C42;
+  --brand-teal: #4DB6AC;
+  --brand-green: #4CAF50;
+  --brand-yellow: #FFCA28;
+  --brand-brown: #8D6E63;
+
+  /* ── Card Tints (pastel backgrounds) ── */
+  --card-tint-peach: #FFF3E8;
+  --card-tint-rose: #FFE8EF;
+  --card-tint-mint: #E8F5E9;
+  --card-tint-lavender: #F3E8FF;
+  --card-tint-sky: #E8F4FD;
+  --card-tint-yellow: #FFF9E0;
+  --card-tint-yellow-bold: #FFCA28;
+  --card-tint-cream: #FFF8F0;
+  --card-tint-gray: #F7F6F3;
+
+  /* ── Surface ── */
+  --surface-canvas: #FFFFFF;
+  --surface: #F7F6F3;
+  --surface-soft: #FBFBFA;
+  --hairline: #E3E2DE;
+  --hairline-soft: #EEEEEC;
+  --hairline-strong: #C3C2BF;
+
+  /* ── Text ── */
+  --text-ink-deep: #000000;
+  --text-ink: #37352F;
+  --text-charcoal: #37352F;
+  --text-slate: #6B6B6B;
+  --text-steel: #9B9A97;
+  --text-stone: #B4B4B0;
+  --text-muted: #CFCDC9;
+  --text-on-dark: #FFFFFF;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.7);
+
+  /* ── Semantic ── */
+  --semantic-success: #4CAF50;
+  --semantic-warning: #FF9800;
+  --semantic-error: #EB5757;
+
+  /* ── Elevation Shadows ── */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-mockup: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ── Font Family ── */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* ── Font Sizes ── */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* ── Primary ── */
+  --color-primary: var(--primary);
+  --color-primary-pressed: var(--primary-pressed);
+  --color-primary-deep: var(--primary-deep);
+
+  /* ── Brand Navy ── */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-deep: var(--brand-navy-deep);
+  --color-brand-navy-mid: var(--brand-navy-mid);
+
+  /* ── Link Blue ── */
+  --color-link-blue: var(--link-blue);
+  --color-link-blue-pressed: var(--link-blue-pressed);
+
+  /* ── Brand Spectrum ── */
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-green: var(--brand-green);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-brown: var(--brand-brown);
+
+  /* ── Card Tints ── */
+  --color-card-tint-peach: var(--card-tint-peach);
+  --color-card-tint-rose: var(--card-tint-rose);
+  --color-card-tint-mint: var(--card-tint-mint);
+  --color-card-tint-lavender: var(--card-tint-lavender);
+  --color-card-tint-sky: var(--card-tint-sky);
+  --color-card-tint-yellow: var(--card-tint-yellow);
+  --color-card-tint-yellow-bold: var(--card-tint-yellow-bold);
+  --color-card-tint-cream: var(--card-tint-cream);
+  --color-card-tint-gray: var(--card-tint-gray);
+
+  /* ── Surface ── */
+  --color-canvas: var(--surface-canvas);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-hairline: var(--hairline);
+  --color-hairline-soft: var(--hairline-soft);
+  --color-hairline-strong: var(--hairline-strong);
+
+  /* ── Text ── */
+  --color-ink-deep: var(--text-ink-deep);
+  --color-ink: var(--text-ink);
+  --color-charcoal: var(--text-charcoal);
+  --color-slate: var(--text-slate);
+  --color-steel: var(--text-steel);
+  --color-stone: var(--text-stone);
+  --color-muted: var(--text-muted);
+  --color-on-dark: var(--text-on-dark);
+  --color-on-dark-muted: var(--text-on-dark-muted);
+
+  /* ── Semantic ── */
+  --color-success: var(--semantic-success);
+  --color-warning: var(--semantic-warning);
+  --color-error: var(--semantic-error);
+
+  /* ── Shadows ── */
+  --shadow-subtle: var(--shadow-subtle);
+  --shadow-card: var(--shadow-card);
+  --shadow-mockup: var(--shadow-mockup);
+  --shadow-modal: var(--shadow-modal);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-canvas);
+  color: var(--text-ink);
+  font-family: var(--font-sans);
 }

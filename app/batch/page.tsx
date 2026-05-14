@@ -107,19 +107,37 @@ export default function BatchPage() {
   const doneCount = items.filter((i) => i.status === "done").length;
   const errorCount = items.filter((i) => i.status === "error").length;
 
+  function statusIndicator(status: BatchItem["status"]) {
+    switch (status) {
+      case "pending":
+        return <span className="text-[#9B9A97] text-xs">待機中</span>;
+      case "processing":
+        return (
+          <span className="flex items-center gap-1.5 text-[#6C5CE7] text-xs font-medium">
+            <span className="animate-spin h-3.5 w-3.5 border-2 border-[#6C5CE7] border-t-transparent rounded-full" />
+            処理中
+          </span>
+        );
+      case "done":
+        return <span className="text-[#4CAF50] text-xs font-medium">✓ 完了</span>;
+      case "error":
+        return <span className="text-[#EB5757] text-xs font-medium">エラー</span>;
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 space-y-6">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-8 py-12 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">一括処理</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">一括添削処理</h1>
+          <p className="text-sm text-[#9B9A97] mt-1">
             複数の答案を一度にアップロードして添削
           </p>
         </div>
 
         {/* Shared topic */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <label className="block text-sm font-medium text-[#37352F] mb-2">
             共通TOPIC（個別に設定しない場合に使用）
           </label>
           <textarea
@@ -127,25 +145,25 @@ export default function BatchPage() {
             onChange={(e) => setSharedTopic(e.target.value)}
             placeholder="Agree or disagree: Technology has made our lives more convenient."
             rows={2}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none resize-none"
           />
         </div>
 
         {/* Dropzone */}
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
             isDragActive
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400 bg-white"
+              ? "border-[#6C5CE7] bg-[#6C5CE7]/5"
+              : "border-[#E3E2DE] bg-[#FBFBFA] hover:border-[#C3C2BF]"
           }`}
         >
           <input {...getInputProps()} />
           <div className="text-3xl mb-2">📦</div>
-          <p className="text-gray-600 font-medium">
+          <p className="text-sm font-medium text-[#37352F]">
             複数の答案写真をドラッグ＆ドロップ
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-[#9B9A97] mt-1">
             またはクリックしてファイルを選択（複数選択可）
           </p>
         </div>
@@ -154,88 +172,77 @@ export default function BatchPage() {
         {items.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#6B6B6B]">
                 {items.length}件 — 完了: {doneCount} / エラー: {errorCount} / 待機: {pendingCount}
               </p>
               {processing && (
-                <p className="text-sm text-blue-600">
+                <p className="text-sm text-[#6C5CE7] font-medium">
                   処理中... {completedCount}/{items.length}
                 </p>
               )}
             </div>
 
-            {items.map((item, i) => (
-              <div
-                key={i}
-                className={`bg-white rounded-xl shadow p-4 border-l-4 ${
-                  item.status === "done"
-                    ? "border-green-500"
-                    : item.status === "error"
-                      ? "border-red-500"
-                      : item.status === "processing"
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">{item.file.name}</span>
-                      {item.status === "processing" && (
-                        <span className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+            <div className="bg-white rounded-xl border border-[#E3E2DE] divide-y divide-[#EEEEEC]">
+              {items.map((item, i) => (
+                <div key={i} className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-[#9B9A97]">{item.file.name}</span>
+                        {statusIndicator(item.status)}
+                        {item.status === "done" && item.result && (
+                          <span className="text-[#4CAF50] text-xs font-bold">
+                            {item.result.score_total}/16
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={item.studentName}
+                          onChange={(e) => updateItem(i, { studentName: e.target.value })}
+                          placeholder="生徒名"
+                          disabled={item.status !== "pending"}
+                          className="flex-1 border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none disabled:bg-[#F7F6F3] disabled:text-[#9B9A97]"
+                        />
+                        <input
+                          type="text"
+                          value={item.topic}
+                          onChange={(e) => updateItem(i, { topic: e.target.value })}
+                          placeholder="個別TOPIC（空欄なら共通）"
+                          disabled={item.status !== "pending"}
+                          className="flex-1 border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none disabled:bg-[#F7F6F3] disabled:text-[#9B9A97]"
+                        />
+                      </div>
+                      {item.error && (
+                        <p className="text-xs text-[#EB5757]">{item.error}</p>
                       )}
-                      {item.status === "done" && (
-                        <span className="text-green-600 text-xs font-bold">
-                          {item.result?.score_total}/16
-                        </span>
+                      {item.status === "done" && item.result?.id && (
+                        <Link
+                          href={`/result/${item.result.id}`}
+                          className="text-xs text-[#2383E2] hover:underline"
+                        >
+                          結果を見る →
+                        </Link>
                       )}
                     </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={item.studentName}
-                        onChange={(e) => updateItem(i, { studentName: e.target.value })}
-                        placeholder="生徒名"
-                        disabled={item.status !== "pending"}
-                        className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm disabled:bg-gray-100"
-                      />
-                      <input
-                        type="text"
-                        value={item.topic}
-                        onChange={(e) => updateItem(i, { topic: e.target.value })}
-                        placeholder="個別TOPIC（空欄なら共通）"
-                        disabled={item.status !== "pending"}
-                        className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm disabled:bg-gray-100"
-                      />
-                    </div>
-                    {item.error && (
-                      <p className="text-xs text-red-600">{item.error}</p>
-                    )}
-                    {item.status === "done" && item.result?.id && (
-                      <Link
-                        href={`/result/${item.result.id}`}
-                        className="text-xs text-blue-600 hover:underline"
+                    {item.status === "pending" && (
+                      <button
+                        onClick={() => removeItem(i)}
+                        className="text-[#EB5757] hover:opacity-70 text-lg font-medium transition-opacity"
                       >
-                        結果を見る →
-                      </Link>
+                        ×
+                      </button>
                     )}
                   </div>
-                  {item.status === "pending" && (
-                    <button
-                      onClick={() => removeItem(i)}
-                      className="text-gray-400 hover:text-red-500 text-lg"
-                    >
-                      ×
-                    </button>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <button
               onClick={processAll}
               disabled={processing || pendingCount === 0}
-              className="w-full py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-3 rounded-lg font-medium text-white bg-[#6C5CE7] hover:opacity-90 disabled:bg-[#E3E2DE] disabled:text-[#9B9A97] disabled:cursor-not-allowed transition-opacity"
             >
               {processing ? (
                 <span className="flex items-center justify-center gap-2">

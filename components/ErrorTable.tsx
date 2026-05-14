@@ -5,55 +5,55 @@ interface Props {
 }
 
 const TYPE_BADGE: Record<string, string> = {
-  grammar: "bg-red-100 text-red-700",
-  vocabulary: "bg-purple-100 text-purple-700",
-  spelling: "bg-orange-100 text-orange-700",
-  punctuation: "bg-yellow-100 text-yellow-700",
-  style: "bg-blue-100 text-blue-700",
+  grammar: "bg-[#FFE8EF] text-[#E255A1]",
+  vocabulary: "bg-[#F3E8FF] text-[#6C5CE7]",
+  spelling: "bg-[#FFF3E8] text-[#FF8C42]",
+  punctuation: "bg-[#FFF9E0] text-[#8D6E63]",
+  style: "bg-[#E8F4FD] text-[#2383E2]",
 };
 
 export default function ErrorTable({ errors }: Props) {
   if (errors.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-bold mb-2">エラーリスト</h2>
-        <p className="text-green-600">エラーは見つかりませんでした。</p>
+      <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <h2 className="text-lg font-semibold text-[#37352F] mb-2">エラーリスト</h2>
+        <p className="text-sm text-[#4CAF50]">エラーは見つかりませんでした。</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-lg font-bold mb-4">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+      <h2 className="text-lg font-semibold text-[#37352F] mb-4">
         エラーリスト（{errors.length}件）
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="pb-2 pr-4">#</th>
-              <th className="pb-2 pr-4">タイプ</th>
-              <th className="pb-2 pr-4">原文</th>
-              <th className="pb-2">修正案</th>
+            <tr className="bg-[#F7F6F3] text-left text-[#6B6B6B]">
+              <th className="py-2 px-3 rounded-tl-lg">#</th>
+              <th className="py-2 px-3">タイプ</th>
+              <th className="py-2 px-3">原文</th>
+              <th className="py-2 px-3 rounded-tr-lg">修正案</th>
             </tr>
           </thead>
           <tbody>
             {errors.map((err) => (
-              <tr key={err.id} className="border-b last:border-0">
-                <td className="py-2 pr-4 text-gray-400">{err.id}</td>
-                <td className="py-2 pr-4">
+              <tr key={err.id} className="border-b border-[#EEEEEC] last:border-0">
+                <td className="py-2 px-3 text-[#9B9A97]">{err.id}</td>
+                <td className="py-2 px-3">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      TYPE_BADGE[err.type] || "bg-gray-100 text-gray-700"
+                    className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                      TYPE_BADGE[err.type] || "bg-[#F7F6F3] text-[#6B6B6B]"
                     }`}
                   >
                     {err.type}
                   </span>
                 </td>
-                <td className="py-2 pr-4 text-red-600 line-through">
+                <td className="py-2 px-3 text-[#EB5757] line-through">
                   {err.original}
                 </td>
-                <td className="py-2 text-green-700 font-medium">
+                <td className="py-2 px-3 text-[#4CAF50] font-medium">
                   {err.correction}
                 </td>
               </tr>

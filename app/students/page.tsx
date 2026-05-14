@@ -75,76 +75,84 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-3xl mx-auto px-4 space-y-6">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-8 py-12 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">生徒管理</h1>
-          <p className="text-gray-500 text-sm mt-1">{students.length}名の生徒</p>
+          <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">生徒管理</h1>
+          <p className="text-sm text-[#9B9A97] mt-1">{students.length}名の生徒</p>
         </div>
 
         {/* Add form */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-bold mb-4">生徒を登録</h2>
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <h2 className="text-lg font-semibold text-[#37352F] mb-4">生徒を登録</h2>
           <form onSubmit={handleAdd} className="flex gap-3 flex-wrap">
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="生徒名 *"
-              className="flex-1 min-w-[150px] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 min-w-[150px] border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
             />
             <input
               type="text"
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
               placeholder="学年（任意）"
-              className="w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-32 border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
             />
             <button
               type="submit"
               disabled={!name.trim() || adding}
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {adding ? "登録中..." : "登録"}
             </button>
           </form>
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-2 text-sm text-[#EB5757]">{error}</p>}
         </div>
 
         {/* Student list */}
-        <div className="bg-white rounded-xl shadow overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-400">
-              <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
-              読み込み中...
+            <div className="p-8 text-center text-[#9B9A97]">
+              <div className="animate-spin h-6 w-6 border-2 border-[#6C5CE7] border-t-transparent rounded-full mx-auto mb-2" />
+              <p className="text-sm">読み込み中...</p>
             </div>
           ) : students.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-8 text-center text-[#9B9A97]">
               <p className="text-3xl mb-2">👤</p>
               <p className="text-sm">まだ生徒が登録されていません</p>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b text-left text-gray-500">
-                  <th className="px-4 py-3">生徒名</th>
-                  <th className="px-4 py-3">学年</th>
-                  <th className="px-4 py-3">登録日</th>
-                  <th className="px-4 py-3 text-right">操作</th>
+                <tr className="bg-[#F7F6F3] text-left text-[#6B6B6B]">
+                  <th className="px-4 py-3 font-medium">生徒名</th>
+                  <th className="px-4 py-3 font-medium">学年</th>
+                  <th className="px-4 py-3 font-medium">登録日</th>
+                  <th className="px-4 py-3 text-right font-medium">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((s) => (
-                  <tr key={s.id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{s.name}</td>
-                    <td className="px-4 py-3 text-gray-600">{s.grade || "—"}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">
+                  <tr key={s.id} className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors">
+                    <td className="px-4 py-3 font-medium text-[#37352F]">{s.name}</td>
+                    <td className="px-4 py-3">
+                      {s.grade ? (
+                        <span className="bg-[#F3E8FF] text-[#6C5CE7] rounded-md px-2 py-0.5 text-xs font-semibold">
+                          {s.grade}
+                        </span>
+                      ) : (
+                        <span className="text-[#9B9A97]">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-[#9B9A97] text-xs">
                       {new Date(s.created_at).toLocaleDateString("ja-JP")}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDelete(s.id, s.name)}
-                        className="text-red-500 hover:text-red-700 text-xs"
+                        className="text-[#EB5757] hover:opacity-70 text-xs font-medium transition-opacity"
                       >
                         削除
                       </button>

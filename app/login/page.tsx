@@ -39,43 +39,43 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-8">
-      <div className="max-w-sm w-full mx-4">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            英検準一級 添削アプリ
+    <div className="min-h-screen bg-white flex items-center justify-center py-8">
+      <div className="w-full max-w-sm mx-4">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">
+            英検ライティング
           </h1>
-          <p className="text-gray-500 text-sm mt-1">教師アカウントでログイン</p>
+          <p className="text-sm text-[#9B9A97] mt-1">教師アカウントでログイン</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
           {/* Tab */}
-          <div className="flex rounded-lg bg-gray-100 p-1">
+          <div className="flex border-b border-[#E3E2DE]">
             <button
               onClick={() => setMode("login")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 pb-3 text-sm font-medium transition-colors ${
                 mode === "login"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500"
+                  ? "text-[#37352F] border-b-2 border-[#37352F]"
+                  : "text-[#9B9A97] hover:text-[#6B6B6B]"
               }`}
             >
               ログイン
             </button>
             <button
               onClick={() => setMode("signup")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`flex-1 pb-3 text-sm font-medium transition-colors ${
                 mode === "signup"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500"
+                  ? "text-[#37352F] border-b-2 border-[#37352F]"
+                  : "text-[#9B9A97] hover:text-[#6B6B6B]"
               }`}
             >
               新規登録
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                 メールアドレス
               </label>
               <input
@@ -83,11 +83,11 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                 パスワード
               </label>
               <input
@@ -96,17 +96,17 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg p-2">
+              <p className="text-sm text-[#EB5757] bg-[#EB5757]/5 rounded-lg p-2.5">
                 {error}
               </p>
             )}
             {message && (
-              <p className="text-sm text-green-600 bg-green-50 rounded-lg p-2">
+              <p className="text-sm text-[#4CAF50] bg-[#4CAF50]/5 rounded-lg p-2.5">
                 {message}
               </p>
             )}
@@ -114,7 +114,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="w-full bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
               {loading
                 ? "処理中..."

@@ -57,20 +57,20 @@ export default function DiffHighlight({ originalText, errors }: Props) {
   const segments = buildSegments(originalText, errors);
 
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      <h2 className="text-lg font-bold mb-3">原文（エラー箇所ハイライト）</h2>
-      <div className="bg-gray-50 rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+      <h2 className="text-lg font-semibold text-[#37352F] mb-3">原文（エラー箇所ハイライト）</h2>
+      <div className="bg-[#FBFBFA] rounded-lg p-5 text-sm leading-relaxed whitespace-pre-wrap">
         {segments.map((seg, i) =>
           seg.isError ? (
             <span key={i} className="relative group">
-              <span className="bg-red-100 text-red-700 underline decoration-red-400 decoration-wavy cursor-help">
+              <span className="bg-[#FFE8EF] text-[#EB5757] underline decoration-[#EB5757] decoration-wavy cursor-help">
                 {seg.text}
               </span>
               {seg.error && (
-                <span className="invisible group-hover:visible absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-10 shadow-lg">
-                  <span className="block text-gray-400">{seg.error.type}</span>
+                <span className="invisible group-hover:visible absolute bottom-full left-0 mb-1 bg-[#191919] text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-10">
+                  <span className="block text-[#9B9A97]">{seg.error.type}</span>
                   <span className="block">
-                    → <span className="text-green-300 font-medium">{seg.error.correction}</span>
+                    → <span className="text-[#4CAF50] font-medium">{seg.error.correction}</span>
                   </span>
                 </span>
               )}
@@ -81,7 +81,7 @@ export default function DiffHighlight({ originalText, errors }: Props) {
         )}
       </div>
       {errors.length > 0 && (
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-[#9B9A97]">
           エラー箇所にマウスを重ねると修正案が表示されます
         </p>
       )}

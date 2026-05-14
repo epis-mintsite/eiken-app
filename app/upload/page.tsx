@@ -134,13 +134,13 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            英検準一級 ライティング添削
+    <div className="min-h-screen bg-white py-12">
+      <div className="max-w-2xl mx-auto px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight text-[#37352F]">
+            ライティング添削
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-[#6B6B6B] mt-2 text-sm">
             手書き答案の写真をアップロードして自動添削
           </p>
         </div>
@@ -148,66 +148,66 @@ export default function UploadPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <UploadDropzone file={file} onFileSelect={setFile} />
 
-          <div className="bg-white rounded-xl shadow p-6 space-y-4">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                生徒名 <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
+                生徒名 <span className="text-[#EB5757]">*</span>
               </label>
               <input
                 type="text"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 placeholder="山田太郎"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                TOPIC <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
+                TOPIC <span className="text-[#EB5757]">*</span>
               </label>
               <textarea
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="Agree or disagree: Technology has made our lives more convenient."
                 rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors resize-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                 日付
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+            <label className="flex items-center gap-2.5 text-sm text-[#37352F] cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={useStreaming}
                 onChange={(e) => setUseStreaming(e.target.checked)}
-                className="rounded"
+                className="rounded accent-[#6C5CE7] w-4 h-4"
               />
               リアルタイム表示（ストリーミング）
             </label>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+            <div className="bg-[#FFF3E8] border border-[#EB5757]/30 text-[#EB5757] rounded-lg p-4 text-sm">
               {error}
             </div>
           )}
 
           {/* Streaming preview */}
           {loading && streamText && (
-            <div className="bg-white rounded-xl shadow p-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+              <h3 className="text-sm font-medium text-[#6B6B6B] mb-3">
                 添削結果（リアルタイム）
               </h3>
-              <pre className="text-xs text-gray-700 whitespace-pre-wrap max-h-60 overflow-y-auto bg-gray-50 rounded-lg p-3">
+              <pre className="text-xs text-[#37352F] whitespace-pre-wrap max-h-60 overflow-y-auto bg-[#FBFBFA] border border-[#E3E2DE] rounded-lg p-4 font-mono leading-relaxed">
                 {streamText}
               </pre>
             </div>
@@ -216,15 +216,15 @@ export default function UploadPage() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className={`w-full py-3 rounded-xl font-bold text-white transition-colors ${
+            className={`w-full py-3 rounded-lg font-medium text-sm text-white transition-colors ${
               canSubmit
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-gray-300 cursor-not-allowed"
+                ? "bg-[#6C5CE7] hover:bg-[#5A4BD1]"
+                : "bg-[#CFCDC9] cursor-not-allowed"
             }`}
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                 {progress}
               </span>
             ) : (

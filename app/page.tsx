@@ -49,92 +49,103 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-4xl mx-auto px-4 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
-          <p className="text-gray-500 mt-1">英検準一級 ライティング添削アプリ</p>
+    <div className="min-h-screen bg-[#FFFFFF]">
+      {/* Hero section */}
+      <div className="bg-[#191919] py-16">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
+            英検準一級 ライティング添削
+          </h1>
+          <p className="mt-3 text-base text-[rgba(255,255,255,0.7)]">
+            手書き答案の自動添削・採点システム
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Link
+              href="/upload"
+              className="bg-[#6C5CE7] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              新規添削
+            </Link>
+            <Link
+              href="/batch"
+              className="border border-[rgba(255,255,255,0.3)] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:border-[rgba(255,255,255,0.5)] transition-colors"
+            >
+              一括処理
+            </Link>
+          </div>
         </div>
+      </div>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Link
-            href="/upload"
-            className="bg-blue-600 text-white rounded-xl p-4 text-center hover:bg-blue-700 transition-colors"
-          >
-            <div className="text-2xl mb-1">📷</div>
-            <div className="text-sm font-medium">新規添削</div>
-          </Link>
-          <Link
-            href="/batch"
-            className="bg-purple-600 text-white rounded-xl p-4 text-center hover:bg-purple-700 transition-colors"
-          >
-            <div className="text-2xl mb-1">📦</div>
-            <div className="text-sm font-medium">一括処理</div>
-          </Link>
-          <Link
-            href="/history"
-            className="bg-green-600 text-white rounded-xl p-4 text-center hover:bg-green-700 transition-colors"
-          >
-            <div className="text-2xl mb-1">📋</div>
-            <div className="text-sm font-medium">添削履歴</div>
-          </Link>
-          <Link
-            href="/students"
-            className="bg-orange-600 text-white rounded-xl p-4 text-center hover:bg-orange-700 transition-colors"
-          >
-            <div className="text-2xl mb-1">👤</div>
-            <div className="text-sm font-medium">生徒管理</div>
-          </Link>
-        </div>
-
+      <div className="max-w-3xl mx-auto px-4 py-10 space-y-10">
         {/* Stats cards */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl shadow p-5 text-center">
-            <p className="text-3xl font-bold text-blue-600">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#6C5CE7]">
               {loading ? "—" : stats?.totalCorrections ?? 0}
             </p>
-            <p className="text-sm text-gray-500 mt-1">添削件数</p>
+            <p className="text-sm text-[#6B6B6B] mt-1">添削件数</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-5 text-center">
-            <p className="text-3xl font-bold text-green-600">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#0D9488]">
               {loading ? "—" : stats?.totalStudents ?? 0}
             </p>
-            <p className="text-sm text-gray-500 mt-1">生徒数</p>
+            <p className="text-sm text-[#6B6B6B] mt-1">生徒数</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-5 text-center">
-            <p className="text-3xl font-bold text-purple-600">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#E67E22]">
               {loading ? "—" : stats?.avgScore ?? 0}
             </p>
-            <p className="text-sm text-gray-500 mt-1">平均スコア / 16</p>
+            <p className="text-sm text-[#6B6B6B] mt-1">平均スコア / 16</p>
           </div>
+        </div>
+
+        {/* Quick action grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Link href="/upload" className="bg-[#F3E8FF] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">新規添削</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">写真をアップロードして添削</p>
+          </Link>
+          <Link href="/batch" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">複数答案をまとめて処理</p>
+          </Link>
+          <Link href="/history" className="bg-[#E8F5E9] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">添削履歴</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">過去の添削結果を確認</p>
+          </Link>
+          <Link href="/students" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">生徒管理</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">生徒情報の管理</p>
+          </Link>
         </div>
 
         {/* Recent corrections */}
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold">最近の添削</h2>
-            <Link href="/history" className="text-sm text-blue-600 hover:underline">
+            <h2 className="text-base font-semibold text-[#37352F]">最近の添削</h2>
+            <Link href="/history" className="text-sm text-[#2383E2] hover:underline">
               すべて見る →
             </Link>
           </div>
           {loading ? (
-            <p className="text-gray-400 text-sm">読み込み中...</p>
+            <p className="text-[#6B6B6B] text-sm">読み込み中...</p>
           ) : stats && stats.recentCorrections.length > 0 ? (
-            <div className="space-y-3">
-              {stats.recentCorrections.map((c) => (
+            <div>
+              {stats.recentCorrections.map((c, i) => (
                 <Link
                   key={c.id}
                   href={`/result/${c.id}`}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-gray-100"
+                  className={`flex items-center justify-between py-3 hover:bg-[#F7F6F3] -mx-2 px-2 rounded-md transition-colors ${
+                    i < stats.recentCorrections.length - 1 ? "border-b border-[#EEEEEC]" : ""
+                  }`}
                 >
                   <div>
-                    <p className="font-medium text-sm text-gray-900">{c.student_name}</p>
-                    <p className="text-xs text-gray-500 truncate max-w-[250px]">{c.topic}</p>
+                    <p className="text-sm font-medium text-[#37352F]">{c.student_name}</p>
+                    <p className="text-xs text-[#6B6B6B] truncate max-w-[250px]">{c.topic}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-blue-600">{c.score_total}/16</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm font-semibold text-[#6C5CE7]">{c.score_total}/16</p>
+                    <p className="text-xs text-[#6B6B6B]">
                       {new Date(c.corrected_at).toLocaleDateString("ja-JP")}
                     </p>
                   </div>
@@ -142,10 +153,9 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-400">
-              <p className="text-3xl mb-2">📝</p>
-              <p className="text-sm">まだ添削データがありません</p>
-              <Link href="/upload" className="text-blue-600 text-sm hover:underline mt-1 inline-block">
+            <div className="text-center py-10">
+              <p className="text-sm text-[#6B6B6B]">まだ添削データがありません</p>
+              <Link href="/upload" className="text-sm text-[#2383E2] hover:underline mt-2 inline-block">
                 最初の添削を始める →
               </Link>
             </div>

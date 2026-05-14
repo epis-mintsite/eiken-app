@@ -52,24 +52,24 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-3xl mx-auto px-4 space-y-6">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-8 py-12 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">設定</h1>
-          <p className="text-gray-500 text-sm mt-1">採点基準とプロンプトの調整</p>
+          <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">設定</h1>
+          <p className="text-sm text-[#9B9A97] mt-1">採点基準とプロンプトの調整</p>
         </div>
 
         {/* Strictness */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-bold mb-4">採点の厳しさ</h2>
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <h2 className="text-lg font-semibold text-[#37352F] mb-4">採点の厳しさ</h2>
           <div className="space-y-3">
             {STRICTNESS_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
-                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
                   settings.strictness === opt.value
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-[#6C5CE7] bg-[#6C5CE7]/5"
+                    : "border-[#E3E2DE] hover:border-[#C3C2BF]"
                 }`}
               >
                 <input
@@ -78,11 +78,11 @@ export default function SettingsPage() {
                   value={opt.value}
                   checked={settings.strictness === opt.value}
                   onChange={() => setSettings({ ...settings, strictness: opt.value })}
-                  className="mt-1"
+                  className="mt-1 accent-[#6C5CE7]"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">{opt.label}</p>
-                  <p className="text-sm text-gray-500">{opt.desc}</p>
+                  <p className="font-medium text-[#37352F]">{opt.label}</p>
+                  <p className="text-sm text-[#6B6B6B]">{opt.desc}</p>
                 </div>
               </label>
             ))}
@@ -90,9 +90,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Custom instructions */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-bold mb-2">カスタム指示</h2>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <h2 className="text-lg font-semibold text-[#37352F] mb-2">カスタム指示</h2>
+          <p className="text-sm text-[#6B6B6B] mb-4">
             添削時にAIに追加で伝えたい指示があれば入力してください（任意）
           </p>
           <textarea
@@ -102,17 +102,17 @@ export default function SettingsPage() {
             }
             placeholder="例: 語彙は特に厳しく評価してください。受動態の使い方に注目してフィードバックをお願いします。"
             rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none resize-none"
           />
         </div>
 
         {/* Prompt preview */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-bold mb-2">プロンプトプレビュー</h2>
-          <p className="text-sm text-gray-500 mb-3">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <h2 className="text-lg font-semibold text-[#37352F] mb-2">プロンプトプレビュー</h2>
+          <p className="text-sm text-[#6B6B6B] mb-3">
             現在の設定で生成されるシステムプロンプトの追加部分
           </p>
-          <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 font-mono whitespace-pre-wrap">
+          <div className="bg-[#F7F6F3] rounded-lg p-4 text-xs font-mono text-[#6B6B6B] whitespace-pre-wrap">
             {settings.strictness === "lenient"
               ? "【採点方針】やさしめ — 良い点を積極的に評価し、基本的なミスのみ指摘。スコアは甘めに付けてください。"
               : settings.strictness === "strict"
@@ -125,9 +125,13 @@ export default function SettingsPage() {
 
         <button
           onClick={save}
-          className="w-full py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+          className="w-full py-3 rounded-lg font-medium text-white bg-[#6C5CE7] hover:opacity-90 transition-opacity"
         >
-          {saved ? "✓ 保存しました" : "設定を保存"}
+          {saved ? (
+            <span className="text-[#4CAF50]">✓ 保存しました</span>
+          ) : (
+            "設定を保存"
+          )}
         </button>
       </div>
     </div>
