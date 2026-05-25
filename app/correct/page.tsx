@@ -26,8 +26,8 @@ function CorrectPageInner() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
   // Summary state
-  const [passageText, setPassageText] = useState("");
-  const [answerText, setAnswerText] = useState("");
+  const [passageFile, setPassageFile] = useState<File | null>(null);
+  const [answerFile, setAnswerFile] = useState<File | null>(null);
   const [summaryStudentName, setSummaryStudentName] = useState("");
   const [summaryDate, setSummaryDate] = useState(
     new Date().toISOString().slice(0, 10)
@@ -41,13 +41,8 @@ function CorrectPageInner() {
   const [useStreaming, setUseStreaming] = useState(true);
 
   const canSubmitWriting = file && studentName.trim() && topic.trim() && !loading;
-  const canSubmitSummary = passageText.trim() && answerText.trim() && !loading;
+  const canSubmitSummary = passageFile && answerFile && !loading;
   const canSubmit = tab === "writing" ? canSubmitWriting : canSubmitSummary;
-
-  const answerWordCount = answerText
-    .trim()
-    .split(/\s+/)
-    .filter((w) => w.length > 0).length;
 
   function resetState() {
     setLoading(false);
@@ -109,17 +104,21 @@ function CorrectPageInner() {
 
   // --- Summary submission ---
   async function handleSummarySubmit() {
-    if (!passageText.trim() || !answerText.trim()) return;
+    if (!passageFile || !answerFile) return;
 
-    let strictness = "standard";
-    let customInstructions = "";
+    const formData = new FormData();
+    formData.append("passageImage", passageFile);
+    formData.append("answerImage", answerFile);
+    formData.append("studentName", summaryStudentName);
+    formData.append("date", summaryDate);
+
     try {
       const stored = localStorage.getItem("eikenSettings");
       if (stored) {
         const settings = JSON.parse(stored);
-        if (settings.strictness) strictness = settings.strictness;
+        if (settings.strictness) formData.append("strictness", settings.strictness);
         if (settings.customInstructions)
-          customInstructions = settings.customInstructions;
+          formData.append("customInstructions", settings.customInstructions);
       }
     } catch {
       // skip
@@ -127,15 +126,7 @@ function CorrectPageInner() {
 
     const res = await fetch("/api/summary-stream", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        passageText,
-        answerText,
-        studentName: summaryStudentName,
-        date: summaryDate,
-        strictness,
-        customInstructions,
-      }),
+      body: formData,
     });
     if (!res.ok) throw new Error("添削処理に失敗しました");
     await processSSE(res, "summary");
@@ -313,52 +304,32 @@ function CorrectPageInner() {
           ) : (
             <>
               {/* Summary form */}
-              <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                    課題文（英文パッセージ）
-                    <span className="text-[#EB5757]"> *</span>
+                  <label className="block text-sm font-medium text-[#37352F] mb-2">
+                    課題文の写真 <span className="text-[#EB5757]">*</span>
                   </label>
-                  <textarea
-                    value={passageText}
-                    onChange={(e) => setPassageText(e.target.value)}
-                    placeholder="Read the following passage and summarize it in 60-70 words.&#10;&#10;(ここに英文パッセージを貼り付けてください)"
-                    rows={10}
-                    className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors resize-none font-mono leading-relaxed"
+                  <UploadDropzone
+                    file={passageFile}
+                    onFileSelect={setPassageFile}
+                    label="課題文（英文パッセージ）の写真をドラッグ＆ドロップ"
+                    description="またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）"
                   />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-[#37352F]">
-                      生徒の解答（要約文）
-                      <span className="text-[#EB5757]"> *</span>
-                    </label>
-                    <span
-                      className={`text-xs font-medium ${
-                        answerWordCount === 0
-                          ? "text-[#9B9A97]"
-                          : answerWordCount >= 60 && answerWordCount <= 70
-                          ? "text-[#4CAF50]"
-                          : "text-[#EB5757]"
-                      }`}
-                    >
-                      {answerWordCount}語
-                      {answerWordCount > 0 && (
-                        <span className="text-[#9B9A97] font-normal">
-                          {" "}
-                          / 60〜70語
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <textarea
-                    value={answerText}
-                    onChange={(e) => setAnswerText(e.target.value)}
-                    placeholder="生徒の要約文を入力してください"
-                    rows={5}
-                    className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors resize-none font-mono leading-relaxed"
+                  <label className="block text-sm font-medium text-[#37352F] mb-2">
+                    生徒の解答の写真 <span className="text-[#EB5757]">*</span>
+                  </label>
+                  <UploadDropzone
+                    file={answerFile}
+                    onFileSelect={setAnswerFile}
+                    label="生徒の解答（要約文）の写真をドラッグ＆ドロップ"
+                    description="またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）"
                   />
                 </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                     生徒名（任意）

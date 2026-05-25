@@ -6,9 +6,16 @@ import { useDropzone } from "react-dropzone";
 interface Props {
   file: File | null;
   onFileSelect: (file: File) => void;
+  label?: string;
+  description?: string;
 }
 
-export default function UploadDropzone({ file, onFileSelect }: Props) {
+export default function UploadDropzone({
+  file,
+  onFileSelect,
+  label = "答案の写真をドラッグ＆ドロップ",
+  description = "またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）",
+}: Props) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const onDrop = useCallback(
@@ -67,10 +74,10 @@ export default function UploadDropzone({ file, onFileSelect }: Props) {
               </svg>
             </div>
             <p className="text-[#37352F] font-medium text-sm">
-              答案の写真をドラッグ＆ドロップ
+              {label}
             </p>
             <p className="text-sm text-[#9B9A97]">
-              またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）
+              {description}
             </p>
           </div>
         )}

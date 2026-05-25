@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { ocrFromImage } from "@/lib/anthropic";
 import { buildSummaryPrompt } from "@/lib/summary-prompt-builder";
 import { supabase } from "@/lib/supabase";
 
@@ -8,12 +9,17 @@ const anthropic = new Anthropic({
 });
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { passageText, answerText, studentName, date, strictness, customInstructions } = body;
+  const formData = await request.formData();
+  const passageImage = formData.get("passageImage") as File | null;
+  const answerImage = formData.get("answerImage") as File | null;
+  const studentName = (formData.get("studentName") as string) || "";
+  const date = (formData.get("date") as string) || new Date().toISOString().slice(0, 10);
+  const strictness = (formData.get("strictness") as string) || "standard";
+  const customInstructions = (formData.get("customInstructions") as string) || "";
 
-  if (!passageText || !answerText) {
+  if (!passageImage || !answerImage) {
     return new Response(
-      JSON.stringify({ error: "passageText, answerText は必須です" }),
+      JSON.stringify({ error: "課題文の写真と解答の写真は必須です" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -29,19 +35,41 @@ export async function POST(request: NextRequest) {
       }
 
       try {
+        // Step 1: OCR passage image
+        send("status", { step: "ocr-passage", message: "課題文を読み取っています..." });
+
+        const passageBuffer = Buffer.from(await passageImage.arrayBuffer());
+        const passageBase64 = passageBuffer.toString("base64");
+        const passageMediaType = passageImage.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+
+        const passageText = await ocrFromImage(passageBase64, passageMediaType);
+
+        send("ocr-passage", { passage_text: passageText });
+
+        // Step 2: OCR answer image
+        send("status", { step: "ocr-answer", message: "生徒の解答を読み取っています..." });
+
+        const answerBuffer = Buffer.from(await answerImage.arrayBuffer());
+        const answerBase64 = answerBuffer.toString("base64");
+        const answerMediaType = answerImage.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+
+        const answerText = await ocrFromImage(answerBase64, answerMediaType);
+
         const wordCount = answerText
           .trim()
           .split(/\s+/)
           .filter((w: string) => w.length > 0).length;
 
-        // Step 1: Build prompt and start streaming
+        send("ocr-answer", { answer_text: answerText, word_count: wordCount });
+
+        // Step 3: Build prompt and start streaming correction
         send("status", { step: "correct", message: "採点・添削を実行中..." });
 
         const { system, user } = buildSummaryPrompt(
           passageText,
           answerText,
-          studentName || "",
-          { strictness: strictness || "standard", customInstructions: customInstructions || "" }
+          studentName,
+          { strictness, customInstructions }
         );
 
         let fullText = "";
@@ -63,7 +91,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Step 2: Parse result
+        // Step 4: Parse result
         send("status", { step: "parse", message: "結果を処理中..." });
 
         const jsonMatch = fullText.match(/\{[\s\S]*\}/);
@@ -73,7 +101,7 @@ export async function POST(request: NextRequest) {
 
         const result = JSON.parse(jsonMatch[0]);
 
-        // Step 3: Save to DB
+        // Step 5: Save to DB
         let recordId: string | null = null;
 
         try {
@@ -83,7 +111,7 @@ export async function POST(request: NextRequest) {
               type: "summary",
               student_name: studentName || "未入力",
               topic: "英文要約",
-              date: date || new Date().toISOString().slice(0, 10),
+              date,
               original_text: answerText,
               passage_text: passageText,
               image_url: null,
