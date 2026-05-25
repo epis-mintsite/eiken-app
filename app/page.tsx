@@ -61,7 +61,7 @@ export default function DashboardPage() {
           </p>
           <div className="mt-6 flex items-center gap-3">
             <Link
-              href="/upload"
+              href="/correct"
               className="bg-[#6C5CE7] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
             >
               新規添削
@@ -108,12 +108,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick action grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Link href="/upload" className="bg-[#F3E8FF] rounded-xl p-5 hover:opacity-80 transition-opacity">
-            <p className="text-sm font-semibold text-[#37352F]">新規添削</p>
-            <p className="text-xs text-[#6B6B6B] mt-1">写真をアップロードして添削</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <Link href="/correct" className="bg-[#F3E8FF] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">ライティング添削</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">手書き答案を写真から添削</p>
           </Link>
-          <Link href="/batch" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          <Link href="/correct?tab=summary" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">要約添削</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">英文要約の採点・添削</p>
+          </Link>
+          <Link href="/batch" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
             <p className="text-xs text-[#6B6B6B] mt-1">複数答案をまとめて処理</p>
           </Link>
@@ -121,9 +125,13 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#37352F]">添削履歴</p>
             <p className="text-xs text-[#6B6B6B] mt-1">過去の添削結果を確認</p>
           </Link>
-          <Link href="/students" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          <Link href="/students" className="bg-[#F0F0EF] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">生徒管理</p>
             <p className="text-xs text-[#6B6B6B] mt-1">生徒情報の管理</p>
+          </Link>
+          <Link href="/guide" className="bg-[#F7F6F3] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#37352F]">操作ガイド</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">使い方を確認</p>
           </Link>
         </div>
 

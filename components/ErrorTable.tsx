@@ -1,7 +1,14 @@
-import { CorrectionError } from "@/types/correction";
+interface ErrorItem {
+  id: number;
+  original: string;
+  type: string;
+  correction: string;
+  explanation?: string;
+}
 
 interface Props {
-  errors: CorrectionError[];
+  errors: ErrorItem[];
+  showExplanation?: boolean;
 }
 
 const TYPE_BADGE: Record<string, string> = {
@@ -12,7 +19,7 @@ const TYPE_BADGE: Record<string, string> = {
   style: "bg-[#E8F4FD] text-[#2383E2]",
 };
 
-export default function ErrorTable({ errors }: Props) {
+export default function ErrorTable({ errors, showExplanation = false }: Props) {
   if (errors.length === 0) {
     return (
       <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
@@ -34,7 +41,8 @@ export default function ErrorTable({ errors }: Props) {
               <th className="py-2 px-3 rounded-tl-lg">#</th>
               <th className="py-2 px-3">タイプ</th>
               <th className="py-2 px-3">原文</th>
-              <th className="py-2 px-3 rounded-tr-lg">修正案</th>
+              <th className="py-2 px-3">修正案</th>
+              {showExplanation && <th className="py-2 px-3 rounded-tr-lg">解説</th>}
             </tr>
           </thead>
           <tbody>
@@ -56,6 +64,11 @@ export default function ErrorTable({ errors }: Props) {
                 <td className="py-2 px-3 text-[#4CAF50] font-medium">
                   {err.correction}
                 </td>
+                {showExplanation && (
+                  <td className="py-2 px-3 text-[#6B6B6B]">
+                    {err.explanation || "—"}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -79,7 +79,7 @@ export default function Navigation() {
               </button>
             )}
             <Link
-              href="/upload"
+              href="/correct"
               className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
             >
               新規添削
@@ -130,7 +130,7 @@ export default function Navigation() {
               </Link>
             ))}
             <Link
-              href="/upload"
+              href="/correct"
               onClick={() => setMobileOpen(false)}
               className="mt-2 bg-[#6C5CE7] text-white rounded-lg px-4 py-2 text-sm font-medium text-center hover:opacity-90 transition-opacity"
             >
