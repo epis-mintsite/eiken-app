@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import UploadDropzone from "@/components/UploadDropzone";
+import { compressImage } from "@/lib/image-compress";
 
 type TabType = "writing" | "summary";
 
@@ -61,8 +62,11 @@ function CorrectPageInner() {
   async function handleWritingSubmit() {
     if (!file || !studentName.trim() || !topic.trim()) return;
 
+    setProgress("画像を圧縮中...");
+    const compressed = await compressImage(file);
+
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", compressed);
     formData.append("studentName", studentName);
     formData.append("topic", topic);
     formData.append("date", date);
@@ -106,9 +110,15 @@ function CorrectPageInner() {
   async function handleSummarySubmit() {
     if (!passageFile || !answerFile) return;
 
+    setProgress("画像を圧縮中...");
+    const [compressedPassage, compressedAnswer] = await Promise.all([
+      compressImage(passageFile),
+      compressImage(answerFile),
+    ]);
+
     const formData = new FormData();
-    formData.append("passageImage", passageFile);
-    formData.append("answerImage", answerFile);
+    formData.append("passageImage", compressedPassage);
+    formData.append("answerImage", compressedAnswer);
     formData.append("studentName", summaryStudentName);
     formData.append("date", summaryDate);
 
@@ -128,7 +138,16 @@ function CorrectPageInner() {
       method: "POST",
       body: formData,
     });
-    if (!res.ok) throw new Error("添削処理に失敗しました");
+    if (!res.ok) {
+      let msg = "添削処理に失敗しました";
+      try {
+        const body = await res.json();
+        if (body.error) msg = body.error;
+      } catch {
+        if (res.status === 413) msg = "画像サイズが大きすぎます。より小さい画像を使用してください。";
+      }
+      throw new Error(msg);
+    }
     await processSSE(res, "summary");
   }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import UploadDropzone from "@/components/UploadDropzone";
+import { compressImage } from "@/lib/image-compress";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -24,11 +25,14 @@ export default function UploadPage() {
 
     setLoading(true);
     setError("");
-    setProgress("画像をアップロード中...");
+    setProgress("画像を圧縮中...");
     setStreamText("");
 
+    const compressed = await compressImage(file);
+
+    setProgress("画像をアップロード中...");
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", compressed);
     formData.append("studentName", studentName);
     formData.append("topic", topic);
     formData.append("date", date);
