@@ -29,7 +29,7 @@ export async function ocrFromImage(
   mediaType: "image/jpeg" | "image/png" | "image/webp" | "image/gif"
 ): Promise<string> {
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 2048,
     messages: [
       {
@@ -62,7 +62,7 @@ export async function correctEssay(
   const { system, user } = buildCorrectionPrompt(originalText, topic, studentName, options);
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 4096,
     system,
     messages: [{ role: "user", content: user }],
