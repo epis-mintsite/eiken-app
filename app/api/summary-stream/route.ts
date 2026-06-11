@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
               good_points_json: result.good_points,
               content_analysis_json: result.content_analysis,
               vocab_suggestions_json: result.vocabulary_suggestions,
+              summary_points_json: result.summary_writing_points,
             })
             .select("id")
             .single();
@@ -155,6 +156,7 @@ export async function POST(request: NextRequest) {
           feedback: result.feedback,
           model_essay: result.model_essay,
           model_essay_annotations: result.model_essay_annotations,
+          summary_writing_points: result.summary_writing_points || [],
           advice: result.advice,
           word_count: wordCount,
         });

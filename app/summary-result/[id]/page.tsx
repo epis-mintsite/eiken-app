@@ -9,6 +9,7 @@ import ContentAnalysis from "@/components/ContentAnalysis";
 import VocabSuggestions from "@/components/VocabSuggestions";
 import FeedbackCard from "@/components/FeedbackCard";
 import ModelEssayAnnotated from "@/components/ModelEssayAnnotated";
+import SummaryWritingPoints from "@/components/SummaryWritingPoints";
 import AdviceList from "@/components/AdviceList";
 import {
   SummaryScores,
@@ -18,6 +19,7 @@ import {
   ContentAnalysis as ContentAnalysisType,
   VocabSuggestion,
   ModelEssayAnnotation,
+  SummaryWritingPoint,
 } from "@/types/summary";
 
 interface SummaryResultData {
@@ -35,6 +37,7 @@ interface SummaryResultData {
   feedback: SummaryFeedback;
   model_essay: string;
   model_essay_annotations: ModelEssayAnnotation[];
+  summary_writing_points: SummaryWritingPoint[];
   advice: SummaryAdvice[];
   word_count: number;
 }
@@ -89,6 +92,7 @@ export default function SummaryResultPage() {
           feedback: record.feedback_json || { content: "", organization: "", vocabulary: "", grammar: "" },
           model_essay: record.model_essay || "",
           model_essay_annotations: [],
+          summary_writing_points: record.summary_points_json || [],
           advice: record.advice_json || [],
           word_count: record.word_count,
         });
@@ -229,6 +233,9 @@ export default function SummaryResultPage() {
           essay={data.model_essay}
           annotations={data.model_essay_annotations || []}
         />
+
+        {/* Summary writing points */}
+        <SummaryWritingPoints points={data.summary_writing_points || []} />
 
         {/* Advice */}
         <AdviceList advice={data.advice} />

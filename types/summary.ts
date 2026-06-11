@@ -45,6 +45,11 @@ export interface SummaryAdvice {
   body: string;
 }
 
+export interface SummaryWritingPoint {
+  title: string;
+  explanation: string;
+}
+
 export interface SummaryResult {
   scores: SummaryScores;
   good_points: string[];
@@ -54,6 +59,7 @@ export interface SummaryResult {
   feedback: SummaryFeedback;
   model_essay: string;
   model_essay_annotations: ModelEssayAnnotation[];
+  summary_writing_points: SummaryWritingPoint[];
   advice: SummaryAdvice[];
 }
 
@@ -75,6 +81,7 @@ export interface SummaryRecord {
   feedback_json: SummaryFeedback;
   model_essay: string;
   model_essay_annotations?: ModelEssayAnnotation[];
+  summary_points_json?: SummaryWritingPoint[];
   advice_json: SummaryAdvice[];
   word_count: number;
   corrected_at: string;
