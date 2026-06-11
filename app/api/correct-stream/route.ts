@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { ocrFromImage } from "@/lib/anthropic";
+import { ocrFromImage, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { buildCorrectionPrompt } from "@/lib/prompt-builder";
 import { supabase } from "@/lib/supabase";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
+  maxRetries: 4,
 });
 
 export async function POST(request: NextRequest) {
@@ -156,10 +157,7 @@ export async function POST(request: NextRequest) {
           word_count: wordCount,
         });
       } catch (error) {
-        send("error", {
-          message:
-            error instanceof Error ? error.message : "添削処理中にエラーが発生しました",
-        });
+        send("error", { message: friendlyAIErrorMessage(error) });
       } finally {
         controller.close();
       }

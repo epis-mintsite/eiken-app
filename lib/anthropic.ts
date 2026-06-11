@@ -4,7 +4,25 @@ import { buildCorrectionPrompt } from "./prompt-builder";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
+  maxRetries: 4,
 });
+
+export function friendlyAIErrorMessage(error: unknown): string {
+  if (error instanceof Anthropic.APIError) {
+    if (error.status === 529) {
+      return "AIサーバーが混雑しています。1〜2分ほど待ってから再試行してください。";
+    }
+    if (error.status === 429) {
+      return "アクセスが集中しています。しばらく待ってから再試行してください。";
+    }
+    if ((error.status ?? 0) >= 500) {
+      return "AIサーバーで一時的なエラーが発生しました。しばらく待ってから再試行してください。";
+    }
+  }
+  return error instanceof Error
+    ? error.message
+    : "添削処理中にエラーが発生しました";
+}
 
 export async function ocrFromImage(
   imageBase64: string,

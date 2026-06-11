@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ocrFromImage, correctEssay } from "@/lib/anthropic";
+import { ocrFromImage, correctEssay, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { supabase } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Correction error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "添削処理中にエラーが発生しました" },
+      { error: friendlyAIErrorMessage(error) },
       { status: 500 }
     );
   }
