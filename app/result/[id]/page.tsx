@@ -7,7 +7,6 @@ import ErrorTable from "@/components/ErrorTable";
 import FeedbackCard from "@/components/FeedbackCard";
 import ModelEssay from "@/components/ModelEssay";
 import AdviceList from "@/components/AdviceList";
-import ExportButtons from "@/components/ExportButtons";
 import DiffHighlight from "@/components/DiffHighlight";
 import { Scores, CorrectionError, Feedback, Advice } from "@/types/correction";
 
@@ -115,7 +114,6 @@ export default function ResultPage() {
         <FeedbackCard feedback={data.feedback} />
         <ModelEssay essay={data.model_essay} />
         <AdviceList advice={data.advice} />
-        <ExportButtons data={data} />
       </div>
     </div>
   );
