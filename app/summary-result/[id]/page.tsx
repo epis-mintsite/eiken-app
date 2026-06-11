@@ -67,33 +67,33 @@ export default function SummaryResultPage() {
         const res = await fetch(`/api/correct/${id}`);
         if (!res.ok) throw new Error("結果を取得できませんでした");
         const record = await res.json();
-        // Map DB record to SummaryResultData
+        // Map API response to SummaryResultData
         setData({
           id: record.id,
           type: "summary",
           student_name: record.student_name,
           passage_text: record.passage_text || "",
           original_text: record.original_text,
-          scores: {
-            content: record.score_content,
-            organization: record.score_org,
-            vocabulary: record.score_vocab,
-            grammar: record.score_grammar,
+          scores: record.scores || {
+            content: 0,
+            organization: 0,
+            vocabulary: 0,
+            grammar: 0,
           },
-          score_total: record.score_content + record.score_org + record.score_vocab + record.score_grammar,
-          good_points: record.good_points_json || [],
-          errors: record.errors_json || [],
-          content_analysis: record.content_analysis_json || {
+          score_total: record.score_total || 0,
+          good_points: record.good_points || [],
+          errors: record.errors || [],
+          content_analysis: record.content_analysis || {
             key_points_coverage: "",
             unnecessary_content: "",
             structure_issues: "",
           },
-          vocabulary_suggestions: record.vocab_suggestions_json || [],
-          feedback: record.feedback_json || { content: "", organization: "", vocabulary: "", grammar: "" },
+          vocabulary_suggestions: record.vocabulary_suggestions || [],
+          feedback: record.feedback || { content: "", organization: "", vocabulary: "", grammar: "" },
           model_essay: record.model_essay || "",
           model_essay_annotations: [],
-          summary_writing_points: record.summary_points_json || [],
-          advice: record.advice_json || [],
+          summary_writing_points: record.summary_writing_points || [],
+          advice: record.advice || [],
           word_count: record.word_count,
         });
       } catch (err) {
