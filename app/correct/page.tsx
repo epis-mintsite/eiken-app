@@ -159,6 +159,7 @@ function CorrectPageInner() {
     const decoder = new TextDecoder();
     let buffer = "";
     let eventType = "";
+    let sawResult = false;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -174,8 +175,13 @@ function CorrectPageInner() {
         } else if (line.startsWith("data: ")) {
           const data = JSON.parse(line.slice(6));
           handleSSEEvent(eventType, data, type);
+          if (eventType === "result") sawResult = true;
         }
       }
+    }
+
+    if (!sawResult) {
+      throw new TypeError("通信が中断されました");
     }
   }
 
@@ -211,6 +217,49 @@ function CorrectPageInner() {
     }
   }
 
+  async function fetchLatestCorrectedAt(): Promise<string> {
+    try {
+      const res = await fetch("/api/history?limit=1");
+      if (!res.ok) return "";
+      const data = await res.json();
+      return data.corrections?.[0]?.corrected_at || "";
+    } catch {
+      return "";
+    }
+  }
+
+  async function recoverAfterConnectionLoss(
+    type: TabType,
+    sinceCorrectedAt: string
+  ): Promise<boolean> {
+    setProgress(
+      "通信が中断されましたが、添削処理はサーバーで継続しています。完了を確認しています..."
+    );
+    const deadline = Date.now() + 150000;
+    while (Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 5000));
+      try {
+        const res = await fetch("/api/history?limit=5");
+        if (!res.ok) continue;
+        const data = await res.json();
+        const rec = (data.corrections || []).find(
+          (c: { id: string; type?: string; corrected_at: string }) =>
+            (c.type === "summary" ? "summary" : "writing") === type &&
+            (!sinceCorrectedAt || c.corrected_at > sinceCorrectedAt)
+        );
+        if (rec) {
+          router.push(
+            type === "summary" ? `/summary-result/${rec.id}` : `/result/${rec.id}`
+          );
+          return true;
+        }
+      } catch {
+        // 接続の回復を待って次のポーリングへ
+      }
+    }
+    return false;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
@@ -220,6 +269,8 @@ function CorrectPageInner() {
     setProgress("処理を開始...");
     setStreamText("");
 
+    const sinceCorrectedAt = await fetchLatestCorrectedAt();
+
     try {
       if (tab === "writing") {
         await handleWritingSubmit();
@@ -227,7 +278,13 @@ function CorrectPageInner() {
         await handleSummarySubmit();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "エラーが発生しました");
+      // 通信切断時はサーバー側で処理が完了している可能性があるため検知を試みる
+      const recovered =
+        err instanceof TypeError &&
+        (await recoverAfterConnectionLoss(tab, sinceCorrectedAt));
+      if (!recovered) {
+        setError(err instanceof Error ? err.message : "エラーが発生しました");
+      }
     } finally {
       setLoading(false);
       setProgress("");

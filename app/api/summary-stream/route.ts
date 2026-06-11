@@ -35,6 +35,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const heartbeat = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(": ping\n\n"));
+        } catch {
+          clearInterval(heartbeat);
+        }
+      }, 10000);
+
       try {
         // Step 1: OCR passage image
         send("status", { step: "ocr-passage", message: "課題文を読み取っています..." });
@@ -164,6 +172,7 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         send("error", { message: friendlyAIErrorMessage(error) });
       } finally {
+        clearInterval(heartbeat);
         controller.close();
       }
     },
