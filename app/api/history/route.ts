@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     let query = supabase
       .from("corrections")
-      .select("id, student_name, topic, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at", { count: "exact" })
+      .select("id, type, student_name, topic, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at", { count: "exact" })
       .order("corrected_at", { ascending: false })
       .range(offset, offset + limit - 1);
 

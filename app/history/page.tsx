@@ -5,6 +5,7 @@ import Link from "next/link";
 
 interface CorrectionSummary {
   id: string;
+  type?: string;
   student_name: string;
   topic: string;
   score_content: number;
@@ -119,7 +120,14 @@ export default function HistoryPage() {
                     {corrections.map((c) => (
                       <tr key={c.id} className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors">
                         <td className="px-4 py-3 font-medium text-[#37352F]">
-                          <Link href={`/result/${c.id}`} className="hover:text-[#2383E2]">
+                          <Link
+                            href={
+                              c.type === "summary"
+                                ? `/summary-result/${c.id}`
+                                : `/result/${c.id}`
+                            }
+                            className="hover:text-[#2383E2]"
+                          >
                             {c.student_name}
                           </Link>
                         </td>

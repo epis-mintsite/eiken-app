@@ -9,6 +9,7 @@ interface Stats {
   avgScore: number;
   recentCorrections: {
     id: string;
+    type?: string;
     student_name: string;
     topic: string;
     score_total: number;
@@ -150,7 +151,11 @@ export default function DashboardPage() {
               {stats.recentCorrections.map((c, i) => (
                 <Link
                   key={c.id}
-                  href={`/result/${c.id}`}
+                  href={
+                    c.type === "summary"
+                      ? `/summary-result/${c.id}`
+                      : `/result/${c.id}`
+                  }
                   className={`flex items-center justify-between py-3 hover:bg-[#F7F6F3] -mx-2 px-2 rounded-md transition-colors ${
                     i < stats.recentCorrections.length - 1 ? "border-b border-[#EEEEEC]" : ""
                   }`}
