@@ -283,7 +283,13 @@ function CorrectPageInner() {
         err instanceof TypeError &&
         (await recoverAfterConnectionLoss(tab, sinceCorrectedAt));
       if (!recovered) {
-        setError(err instanceof Error ? err.message : "エラーが発生しました");
+        setError(
+          err instanceof TypeError
+            ? "通信エラーで送信できませんでした。電波の良い場所でもう一度お試しください。"
+            : err instanceof Error
+              ? err.message
+              : "エラーが発生しました"
+        );
       }
     } finally {
       setLoading(false);
