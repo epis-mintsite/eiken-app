@@ -122,66 +122,12 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
             <p className="text-xs text-[#6B6B6B] mt-1">複数答案をまとめて処理</p>
           </Link>
-          <Link href="/history" className="bg-[#E8F5E9] rounded-xl p-5 hover:opacity-80 transition-opacity">
-            <p className="text-sm font-semibold text-[#37352F]">添削履歴</p>
-            <p className="text-xs text-[#6B6B6B] mt-1">過去の添削結果を確認</p>
-          </Link>
-          <Link href="/students" className="bg-[#F0F0EF] rounded-xl p-5 hover:opacity-80 transition-opacity">
-            <p className="text-sm font-semibold text-[#37352F]">生徒管理</p>
-            <p className="text-xs text-[#6B6B6B] mt-1">生徒情報の管理</p>
-          </Link>
           <Link href="/guide" className="bg-[#F7F6F3] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">操作ガイド</p>
             <p className="text-xs text-[#6B6B6B] mt-1">使い方を確認</p>
           </Link>
         </div>
 
-        {/* Recent corrections */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-[#37352F]">最近の添削</h2>
-            <Link href="/history" className="text-sm text-[#2383E2] hover:underline">
-              すべて見る →
-            </Link>
-          </div>
-          {loading ? (
-            <p className="text-[#6B6B6B] text-sm">読み込み中...</p>
-          ) : stats && stats.recentCorrections.length > 0 ? (
-            <div>
-              {stats.recentCorrections.map((c, i) => (
-                <Link
-                  key={c.id}
-                  href={
-                    c.type === "summary"
-                      ? `/summary-result/${c.id}`
-                      : `/result/${c.id}`
-                  }
-                  className={`flex items-center justify-between py-3 hover:bg-[#F7F6F3] -mx-2 px-2 rounded-md transition-colors ${
-                    i < stats.recentCorrections.length - 1 ? "border-b border-[#EEEEEC]" : ""
-                  }`}
-                >
-                  <div>
-                    <p className="text-sm font-medium text-[#37352F]">{c.student_name}</p>
-                    <p className="text-xs text-[#6B6B6B] truncate max-w-[250px]">{c.topic}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-[#6C5CE7]">{c.score_total}/16</p>
-                    <p className="text-xs text-[#6B6B6B]">
-                      {new Date(c.corrected_at).toLocaleDateString("ja-JP")}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10">
-              <p className="text-sm text-[#6B6B6B]">まだ添削データがありません</p>
-              <Link href="/upload" className="text-sm text-[#2383E2] hover:underline mt-2 inline-block">
-                最初の添削を始める →
-              </Link>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
