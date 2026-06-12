@@ -9,8 +9,6 @@ import { signOut } from "@/lib/auth";
 const NAV_ITEMS = [
   { href: "/", label: "ダッシュボード" },
   { href: "/batch", label: "一括処理" },
-  { href: "/history", label: "履歴" },
-  { href: "/students", label: "生徒管理" },
   { href: "/settings", label: "設定" },
   { href: "/guide", label: "ガイド" },
 ];
