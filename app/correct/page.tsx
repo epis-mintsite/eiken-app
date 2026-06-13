@@ -414,7 +414,7 @@ function CorrectPageInner() {
               <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                    生徒名（任意）
+                    生徒名（ユーザーID）
                   </label>
                   <input
                     type="text"
