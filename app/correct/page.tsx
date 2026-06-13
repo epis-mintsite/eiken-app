@@ -319,7 +319,7 @@ function CorrectPageInner() {
                 : "text-[#9B9A97] hover:text-[#37352F]"
             }`}
           >
-            ライティング添削
+            英作文添削
             {tab === "writing" && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#37352F]" />
             )}
