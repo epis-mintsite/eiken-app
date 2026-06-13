@@ -111,7 +111,7 @@ export default function DashboardPage() {
         {/* Quick action grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <Link href="/correct" className="bg-[#F3E8FF] rounded-xl p-5 hover:opacity-80 transition-opacity">
-            <p className="text-sm font-semibold text-[#37352F]">ライティング添削</p>
+            <p className="text-sm font-semibold text-[#37352F]">英作文添削</p>
             <p className="text-xs text-[#6B6B6B] mt-1">手書き答案を写真から添削</p>
           </Link>
           <Link href="/correct?tab=summary" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
