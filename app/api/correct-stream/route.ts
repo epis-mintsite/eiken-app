@@ -128,6 +128,7 @@ export async function POST(request: NextRequest) {
               date,
               original_text: originalText,
               image_url: imageUrl,
+              strictness,
               score_content: result.scores.content,
               score_org: result.scores.organization,
               score_vocab: result.scores.vocabulary,

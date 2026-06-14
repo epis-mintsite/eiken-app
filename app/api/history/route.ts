@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("corrections")
       .select(
-        "id, type, student_name, topic, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at",
+        "id, type, student_name, topic, strictness, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at",
         { count: "exact" }
       )
       .order(validSortBy, { ascending })

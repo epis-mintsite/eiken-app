@@ -11,6 +11,7 @@ interface CorrectionSummary {
   type?: string;
   student_name: string;
   topic: string;
+  strictness?: string;
   score_content: number;
   score_org: number;
   score_vocab: number;
@@ -86,6 +87,12 @@ export default function HistoryPage() {
   }
 
   const hasFilter = studentFilter || dateFrom || dateTo;
+
+  function StrictnessLabel({ strictness }: { strictness?: string }) {
+    if (strictness === "lenient") return <span className="text-xs px-2 py-0.5 rounded-full bg-[#E8F4FD] text-[#2383E2]">やさしめ</span>;
+    if (strictness === "strict") return <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFF3E8] text-[#E67E22]">厳しめ</span>;
+    return <span className="text-xs px-2 py-0.5 rounded-full bg-[#F7F6F3] text-[#6B6B6B]">標準</span>;
+  }
 
   function scoreColor(score: number): string {
     if (score >= 13) return "text-[#4CAF50]";
@@ -174,6 +181,7 @@ export default function HistoryPage() {
                         </button>
                       </th>
                       <th className="px-4 py-3 font-medium">TOPIC</th>
+                      <th className="px-4 py-3 text-center font-medium">採点の厳しさ</th>
                       <th className="px-4 py-3 text-center font-medium">スコア</th>
                       <th className="px-4 py-3 text-center font-medium">語数</th>
                       <th className="px-4 py-3 font-medium">
@@ -202,6 +210,9 @@ export default function HistoryPage() {
                         </td>
                         <td className="px-4 py-3 text-[#6B6B6B] max-w-[200px] truncate">
                           {c.topic}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <StrictnessLabel strictness={c.strictness} />
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className={`font-bold ${scoreColor(c.score_total)}`}>

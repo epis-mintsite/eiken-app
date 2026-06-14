@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
               original_text: answerText,
               passage_text: passageText,
               image_url: null,
+              strictness,
               score_content: result.scores.content,
               score_org: result.scores.organization,
               score_vocab: result.scores.vocabulary,
