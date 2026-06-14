@@ -5,21 +5,39 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const limit = parseInt(url.searchParams.get("limit") || "20");
   const offset = parseInt(url.searchParams.get("offset") || "0");
-  const studentName = url.searchParams.get("student") || "";
+  const studentFilter = url.searchParams.get("student") || "";
   const search = url.searchParams.get("search") || "";
+  const sortBy = url.searchParams.get("sortBy") || "corrected_at";
+  const sortOrder = url.searchParams.get("sortOrder") || "desc";
+  const dateFrom = url.searchParams.get("dateFrom") || "";
+  const dateTo = url.searchParams.get("dateTo") || "";
 
   try {
+    const validSortBy = ["corrected_at", "student_name"].includes(sortBy)
+      ? (sortBy as "corrected_at" | "student_name")
+      : "corrected_at";
+    const ascending = sortOrder === "asc";
+
     let query = supabase
       .from("corrections")
-      .select("id, type, student_name, topic, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at", { count: "exact" })
-      .order("corrected_at", { ascending: false })
+      .select(
+        "id, type, student_name, topic, score_content, score_org, score_vocab, score_grammar, word_count, corrected_at",
+        { count: "exact" }
+      )
+      .order(validSortBy, { ascending })
       .range(offset, offset + limit - 1);
 
-    if (studentName) {
-      query = query.eq("student_name", studentName);
+    if (studentFilter) {
+      query = query.ilike("student_name", `%${studentFilter}%`);
     }
     if (search) {
       query = query.or(`topic.ilike.%${search}%,student_name.ilike.%${search}%`);
+    }
+    if (dateFrom) {
+      query = query.gte("corrected_at", `${dateFrom}T00:00:00`);
+    }
+    if (dateTo) {
+      query = query.lte("corrected_at", `${dateTo}T23:59:59`);
     }
 
     const { data, error, count } = await query;

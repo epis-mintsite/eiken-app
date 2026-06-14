@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 
+type SortBy = "corrected_at" | "student_name";
+type SortOrder = "asc" | "desc";
+
 interface CorrectionSummary {
   id: string;
   type?: string;
@@ -21,7 +24,11 @@ export default function HistoryPage() {
   const [corrections, setCorrections] = useState<CorrectionSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [studentFilter, setStudentFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [sortBy, setSortBy] = useState<SortBy>("corrected_at");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [page, setPage] = useState(0);
   const limit = 15;
 
@@ -31,8 +38,12 @@ export default function HistoryPage() {
       const params = new URLSearchParams({
         limit: String(limit),
         offset: String(page * limit),
+        sortBy,
+        sortOrder,
       });
-      if (search) params.set("search", search);
+      if (studentFilter) params.set("student", studentFilter);
+      if (dateFrom) params.set("dateFrom", dateFrom);
+      if (dateTo) params.set("dateTo", dateTo);
       const res = await fetch(`/api/history?${params}`);
       if (res.ok) {
         const data = await res.json();
@@ -44,13 +55,37 @@ export default function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, page]);
+  }, [studentFilter, dateFrom, dateTo, sortBy, sortOrder, page]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const totalPages = Math.ceil(total / limit);
+
+  function handleSort(col: SortBy) {
+    if (sortBy === col) {
+      setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(col);
+      setSortOrder(col === "corrected_at" ? "desc" : "asc");
+    }
+    setPage(0);
+  }
+
+  function SortIcon({ col }: { col: SortBy }) {
+    if (sortBy !== col) return <span className="ml-1 text-[#C3C2BF]">↕</span>;
+    return <span className="ml-1 text-[#6C5CE7]">{sortOrder === "asc" ? "↑" : "↓"}</span>;
+  }
+
+  function clearFilters() {
+    setStudentFilter("");
+    setDateFrom("");
+    setDateTo("");
+    setPage(0);
+  }
+
+  const hasFilter = studentFilter || dateFrom || dateTo;
 
   function scoreColor(score: number): string {
     if (score >= 13) return "text-[#4CAF50]";
@@ -68,25 +103,46 @@ export default function HistoryPage() {
             <p className="text-sm text-[#9B9A97] mt-1">{total}件の添削</p>
           </div>
           <Link
-            href="/upload"
+            href="/correct"
             className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
           >
             新規添削
           </Link>
         </div>
 
-        {/* Search */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(0);
-            }}
-            placeholder="生徒名またはTOPICで検索..."
-            className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
-          />
+        {/* Filters */}
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-5 space-y-3">
+          <p className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">絞り込み</p>
+          <div className="flex flex-wrap gap-3">
+            <input
+              type="text"
+              value={studentFilter}
+              onChange={(e) => { setStudentFilter(e.target.value); setPage(0); }}
+              placeholder="生徒名（ユーザーID）"
+              className="flex-1 min-w-[160px] border border-[#C3C2BF] rounded-lg px-3 py-2 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
+            />
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => { setDateFrom(e.target.value); setPage(0); }}
+              className="border border-[#C3C2BF] rounded-lg px-3 py-2 text-sm text-[#37352F] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
+            />
+            <span className="self-center text-[#9B9A97] text-sm">〜</span>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => { setDateTo(e.target.value); setPage(0); }}
+              className="border border-[#C3C2BF] rounded-lg px-3 py-2 text-sm text-[#37352F] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
+            />
+            {hasFilter && (
+              <button
+                onClick={clearFilters}
+                className="text-sm text-[#9B9A97] hover:text-[#EB5757] transition-colors px-2"
+              >
+                クリア
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Results */}
@@ -100,7 +156,7 @@ export default function HistoryPage() {
             <div className="p-8 text-center text-[#9B9A97]">
               <p className="text-3xl mb-2">📋</p>
               <p className="text-sm">
-                {search ? "検索結果がありません" : "まだ添削データがありません"}
+                {hasFilter ? "条件に一致するデータがありません" : "まだ添削データがありません"}
               </p>
             </div>
           ) : (
@@ -109,23 +165,36 @@ export default function HistoryPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-[#F7F6F3] text-left text-[#6B6B6B]">
-                      <th className="px-4 py-3 font-medium">生徒名</th>
+                      <th className="px-4 py-3 font-medium">
+                        <button
+                          onClick={() => handleSort("student_name")}
+                          className="flex items-center hover:text-[#37352F] transition-colors"
+                        >
+                          生徒名<SortIcon col="student_name" />
+                        </button>
+                      </th>
                       <th className="px-4 py-3 font-medium">TOPIC</th>
                       <th className="px-4 py-3 text-center font-medium">スコア</th>
                       <th className="px-4 py-3 text-center font-medium">語数</th>
-                      <th className="px-4 py-3 font-medium">日時</th>
+                      <th className="px-4 py-3 font-medium">
+                        <button
+                          onClick={() => handleSort("corrected_at")}
+                          className="flex items-center hover:text-[#37352F] transition-colors"
+                        >
+                          日時<SortIcon col="corrected_at" />
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {corrections.map((c) => (
-                      <tr key={c.id} className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors">
+                      <tr
+                        key={c.id}
+                        className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors"
+                      >
                         <td className="px-4 py-3 font-medium text-[#37352F]">
                           <Link
-                            href={
-                              c.type === "summary"
-                                ? `/summary-result/${c.id}`
-                                : `/result/${c.id}`
-                            }
+                            href={c.type === "summary" ? `/summary-result/${c.id}` : `/result/${c.id}`}
                             className="hover:text-[#2383E2]"
                           >
                             {c.student_name}
