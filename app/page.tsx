@@ -3,42 +3,28 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Stats {
+interface TypeStats {
   totalCorrections: number;
   totalStudents: number;
   avgScore: number;
-  recentCorrections: {
-    id: string;
-    type?: string;
-    student_name: string;
-    topic: string;
-    score_total: number;
-    corrected_at: string;
-  }[];
+}
+
+interface DashboardStats {
+  summary: TypeStats;
+  writing: TypeStats;
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/history?limit=5");
+        const res = await fetch("/api/dashboard-stats");
         if (res.ok) {
           const data = await res.json();
-          const corrections = data.corrections || [];
-          const students = new Set(corrections.map((c: { student_name: string }) => c.student_name));
-          const totalScore = corrections.reduce(
-            (sum: number, c: { score_total: number }) => sum + (c.score_total || 0),
-            0
-          );
-          setStats({
-            totalCorrections: data.total || corrections.length,
-            totalStudents: students.size,
-            avgScore: corrections.length > 0 ? Math.round((totalScore / corrections.length) * 10) / 10 : 0,
-            recentCorrections: corrections.slice(0, 5),
-          });
+          setStats(data);
         }
       } catch {
         // DB未接続の場合はスキップ
@@ -48,6 +34,34 @@ export default function DashboardPage() {
     }
     load();
   }, []);
+
+  function StatRow({ data, label }: { data: TypeStats | undefined; label: string }) {
+    return (
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">{label}</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#6C5CE7]">
+              {loading ? "—" : data?.totalCorrections ?? 0}
+            </p>
+            <p className="text-sm text-[#6B6B6B] mt-1">添削件数</p>
+          </div>
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#0D9488]">
+              {loading ? "—" : data?.totalStudents ?? 0}
+            </p>
+            <p className="text-sm text-[#6B6B6B] mt-1">生徒数</p>
+          </div>
+          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <p className="text-3xl font-bold text-[#E67E22]">
+              {loading ? "—" : data?.avgScore ?? 0}
+            </p>
+            <p className="text-sm text-[#6B6B6B] mt-1">平均スコア / 16</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
@@ -87,25 +101,9 @@ export default function DashboardPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-10">
         {/* Stats cards */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
-            <p className="text-3xl font-bold text-[#6C5CE7]">
-              {loading ? "—" : stats?.totalCorrections ?? 0}
-            </p>
-            <p className="text-sm text-[#6B6B6B] mt-1">添削件数</p>
-          </div>
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
-            <p className="text-3xl font-bold text-[#0D9488]">
-              {loading ? "—" : stats?.totalStudents ?? 0}
-            </p>
-            <p className="text-sm text-[#6B6B6B] mt-1">生徒数</p>
-          </div>
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
-            <p className="text-3xl font-bold text-[#E67E22]">
-              {loading ? "—" : stats?.avgScore ?? 0}
-            </p>
-            <p className="text-sm text-[#6B6B6B] mt-1">平均スコア / 16</p>
-          </div>
+        <div className="space-y-6">
+          <StatRow data={stats?.summary} label="要約添削" />
+          <StatRow data={stats?.writing} label="英作文添削" />
         </div>
 
         {/* Quick action grid */}
@@ -127,7 +125,6 @@ export default function DashboardPage() {
             <p className="text-xs text-[#6B6B6B] mt-1">使い方を確認</p>
           </Link>
         </div>
-
       </div>
     </div>
   );
