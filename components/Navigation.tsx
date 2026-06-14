@@ -31,6 +31,8 @@ export default function Navigation() {
     return href === "/" ? pathname === "/" : pathname.startsWith(href);
   }
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-[#E3E2DE]">
       <div className="max-w-[1280px] mx-auto px-8">
@@ -63,6 +65,21 @@ export default function Navigation() {
                 )}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/history"
+                className={`relative px-3 py-4 text-sm font-medium transition-colors ${
+                  isActive("/history")
+                    ? "text-[#37352F]"
+                    : "text-[#6B6B6B] hover:text-[#37352F]"
+                }`}
+              >
+                添削履歴
+                {isActive("/history") && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#37352F]" />
+                )}
+              </Link>
+            )}
           </div>
 
           {/* Right: CTA + Auth (desktop) */}
@@ -127,6 +144,19 @@ export default function Navigation() {
                 {label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/history"
+                onClick={() => setMobileOpen(false)}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/history")
+                    ? "text-[#37352F] bg-[#F1F1EF]"
+                    : "text-[#6B6B6B] hover:bg-[#F7F6F3]"
+                }`}
+              >
+                添削履歴
+              </Link>
+            )}
             <Link
               href="/correct"
               onClick={() => setMobileOpen(false)}
