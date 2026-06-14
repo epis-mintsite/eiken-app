@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type SortBy = "corrected_at" | "student_name";
 type SortOrder = "asc" | "desc";
@@ -22,6 +23,7 @@ interface CorrectionSummary {
 }
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [corrections, setCorrections] = useState<CorrectionSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -198,15 +200,11 @@ export default function HistoryPage() {
                     {corrections.map((c) => (
                       <tr
                         key={c.id}
-                        className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors"
+                        onClick={() => router.push(c.type === "summary" ? `/summary-result/${c.id}` : `/result/${c.id}`)}
+                        className="border-b border-[#EEEEEC] last:border-0 hover:bg-[#F7F6F3] transition-colors cursor-pointer"
                       >
                         <td className="px-4 py-3 font-medium text-[#37352F]">
-                          <Link
-                            href={c.type === "summary" ? `/summary-result/${c.id}` : `/result/${c.id}`}
-                            className="hover:text-[#2383E2]"
-                          >
-                            {c.student_name}
-                          </Link>
+                          {c.student_name}
                         </td>
                         <td className="px-4 py-3 text-[#6B6B6B] max-w-[200px] truncate">
                           {c.topic}
