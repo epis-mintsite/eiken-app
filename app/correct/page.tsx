@@ -11,6 +11,30 @@ function CorrectPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "summary" ? "summary" : "writing";
+
+  // メンテナンス中は早期リターン
+  if (true) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+        <div className="max-w-md w-full bg-[#FFF8E1] border border-[#FFE082] rounded-2xl p-8 text-center">
+          <p className="text-4xl mb-4">🔧</p>
+          <h2 className="text-lg font-semibold text-[#7B5800] mb-2">
+            現在サービスを一時停止しています
+          </h2>
+          <p className="text-sm text-[#9B7A00] leading-relaxed">
+            コンテンツ更新のため、添削機能を一時的に停止しています。<br />
+            再開後に改めてご利用ください。
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-6 text-sm text-[#6C5CE7] hover:underline"
+          >
+            ← トップページへ戻る
+          </button>
+        </div>
+      </div>
+    );
+  }
   const [tab, setTab] = useState<TabType>(initialTab);
 
   useEffect(() => {

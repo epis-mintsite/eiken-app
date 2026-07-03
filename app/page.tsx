@@ -65,6 +65,17 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
+      {/* Maintenance banner */}
+      <div className="bg-[#FFF8E1] border-b border-[#FFE082] px-4 py-3">
+        <div className="max-w-3xl mx-auto flex items-start gap-3">
+          <span className="text-lg leading-none mt-0.5">🔧</span>
+          <div>
+            <p className="text-sm font-semibold text-[#7B5800]">現在、コンテンツ更新のためサービスを一時停止しています</p>
+            <p className="text-xs text-[#9B7A00] mt-0.5">添削・一括処理の新規投稿はご利用いただけません。再開後に改めてご利用ください。</p>
+          </div>
+        </div>
+      </div>
+
       {/* Hero section */}
       <div className="border-b border-[#E3E2DE] py-12">
         <div className="max-w-3xl mx-auto px-4">
@@ -75,18 +86,12 @@ export default function DashboardPage() {
             手書き答案の自動添削・採点システム
           </p>
           <div className="mt-6 flex items-center gap-3">
-            <Link
-              href="/correct"
-              className="bg-[#6C5CE7] text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
-            >
+            <span className="bg-[#C3C2BF] text-white rounded-lg px-5 py-2.5 text-sm font-medium cursor-not-allowed opacity-60">
               新規添削
-            </Link>
-            <Link
-              href="/batch"
-              className="border border-[#E3E2DE] text-[#37352F] rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-[#F7F6F3] transition-colors"
-            >
+            </span>
+            <span className="border border-[#E3E2DE] text-[#C3C2BF] rounded-lg px-5 py-2.5 text-sm font-medium cursor-not-allowed opacity-60">
               一括処理
-            </Link>
+            </span>
           </div>
           <div className="mt-3">
             <Link
@@ -108,18 +113,18 @@ export default function DashboardPage() {
 
         {/* Quick action grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <Link href="/correct" className="bg-[#F3E8FF] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          <div className="bg-[#F3E8FF] rounded-xl p-5 opacity-40 cursor-not-allowed">
             <p className="text-sm font-semibold text-[#37352F]">英作文添削</p>
             <p className="text-xs text-[#6B6B6B] mt-1">手書き答案を写真から添削</p>
-          </Link>
-          <Link href="/correct?tab=summary" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          </div>
+          <div className="bg-[#E8F4FD] rounded-xl p-5 opacity-40 cursor-not-allowed">
             <p className="text-sm font-semibold text-[#37352F]">要約添削</p>
             <p className="text-xs text-[#6B6B6B] mt-1">英文要約の採点・添削</p>
-          </Link>
-          <Link href="/batch" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          </div>
+          <div className="bg-[#FFF3E8] rounded-xl p-5 opacity-40 cursor-not-allowed">
             <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
             <p className="text-xs text-[#6B6B6B] mt-1">複数答案をまとめて処理</p>
-          </Link>
+          </div>
           <Link href="/guide" className="bg-[#F7F6F3] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">操作ガイド</p>
             <p className="text-xs text-[#6B6B6B] mt-1">使い方を確認</p>
