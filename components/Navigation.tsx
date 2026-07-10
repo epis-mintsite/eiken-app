@@ -76,7 +76,7 @@ export default function Navigation() {
             {/* Left: Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <span className="text-[#37352F] font-semibold text-base tracking-tight">
-                英検ライティング添削
+                準一級ライティング添削
               </span>
             </Link>
 

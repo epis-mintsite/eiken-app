@@ -42,7 +42,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
   // Title
   doc.setFontSize(20);
   doc.setFont("Helvetica", "bold");
-  doc.text("Eiken Pre-1 Writing Report", margin, y);
+  doc.text("Pre-1 Writing Report", margin, y);
   y += 10;
 
   // Student info
@@ -198,7 +198,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
     doc.setFont("Helvetica", "normal");
     doc.setTextColor(150);
     doc.text(
-      `Eiken Pre-1 Writing Report - Page ${i}/${pageCount}`,
+      `Pre-1 Writing Report - Page ${i}/${pageCount}`,
       pageWidth / 2,
       290,
       { align: "center" }

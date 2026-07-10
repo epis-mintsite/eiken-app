@@ -80,10 +80,10 @@ export default function DashboardPage() {
       <div className="border-b border-[#E3E2DE] py-12">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#37352F]">
-            英検準一級 ライティング添削
+            準一級ライティング添削
           </h1>
           <p className="mt-2 text-sm text-[#9B9A97]">
-            手書き答案の自動添削・採点システム
+            手書き答案の自動添削・採点システム（英検®準一級レベル対応）
           </p>
           <div className="mt-6 flex items-center gap-3">
             <span className="bg-[#C3C2BF] text-white rounded-lg px-5 py-2.5 text-sm font-medium cursor-not-allowed opacity-60">

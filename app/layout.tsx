@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "英検準一級 ライティング添削",
+  title: "準一級ライティング添削",
   description: "手書き答案の写真をアップロードして自動添削・採点",
 };
 
@@ -28,6 +28,14 @@ export default function RootLayout({
         <AuthProvider>
           <Navigation />
           <main className="flex-1">{children}</main>
+          <footer className="border-t border-[#E3E2DE] py-6 bg-white">
+            <div className="max-w-4xl mx-auto px-4 text-xs text-[#9B9A97] leading-relaxed space-y-1">
+              <p>
+                本サービスは、公益財団法人 日本英語検定協会とは無関係であり、同協会の承認・推奨を受けたものではありません。
+              </p>
+              <p>英検®は、公益財団法人 日本英語検定協会の登録商標です。</p>
+            </div>
+          </footer>
         </AuthProvider>
       </body>
     </html>
