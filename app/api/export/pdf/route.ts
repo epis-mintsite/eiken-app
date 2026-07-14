@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generatePdf, PdfInput } from "@/lib/pdf-generator";
+import { generatePdfReport, PdfInput } from "@/lib/pdf-report";
 
 export async function POST(request: NextRequest) {
   try {
     const data: PdfInput = await request.json();
 
-    const pdfBuffer = await generatePdf(data);
+    const pdfBuffer = await generatePdfReport(data);
+
+    const studentName = data.student_name || "report";
+    const dateStr = data.date || new Date().toISOString().slice(0, 10);
+    const filename = `eiken_${studentName}_${dateStr}.pdf`;
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="eiken_report_${Date.now()}.pdf"`,
+        "Content-Disposition": `attachment; filename="${encodeURIComponent(filename)}"`,
+        "Content-Length": String(pdfBuffer.length),
       },
     });
   } catch (error) {

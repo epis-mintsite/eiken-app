@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import UploadDropzone from "@/components/UploadDropzone";
 import { compressImage } from "@/lib/image-compress";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function UploadPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
-  const [studentName, setStudentName] = useState("");
   const [topic, setTopic] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function UploadPage() {
   const [error, setError] = useState("");
   const [useStreaming, setUseStreaming] = useState(true);
 
-  const canSubmit = file && studentName.trim() && topic.trim() && !loading;
+  const canSubmit = file && topic.trim() && !loading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function UploadPage() {
     setProgress("画像をアップロード中...");
     const formData = new FormData();
     formData.append("image", compressed);
-    formData.append("studentName", studentName);
+    formData.append("studentName", user?.name || "未入力");
     formData.append("topic", topic);
     formData.append("date", date);
 
@@ -155,18 +156,6 @@ export default function UploadPage() {
           <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
             <div>
               <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                生徒名 <span className="text-[#EB5757]">*</span>
-              </label>
-              <input
-                type="text"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="山田太郎"
-                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                 TOPIC <span className="text-[#EB5757]">*</span>
               </label>
               <textarea
@@ -191,32 +180,11 @@ export default function UploadPage() {
                 className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
               />
             </div>
-            <label className="flex items-center gap-2.5 text-sm text-[#37352F] cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={useStreaming}
-                onChange={(e) => setUseStreaming(e.target.checked)}
-                className="rounded accent-[#6C5CE7] w-4 h-4"
-              />
-              リアルタイム表示（ストリーミング）
-            </label>
           </div>
 
           {error && (
             <div className="bg-[#FFF3E8] border border-[#EB5757]/30 text-[#EB5757] rounded-lg p-4 text-sm">
               {error}
-            </div>
-          )}
-
-          {/* Streaming preview */}
-          {loading && streamText && (
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
-              <h3 className="text-sm font-medium text-[#6B6B6B] mb-3">
-                添削結果（リアルタイム）
-              </h3>
-              <pre className="text-xs text-[#37352F] whitespace-pre-wrap max-h-60 overflow-y-auto bg-[#FBFBFA] border border-[#E3E2DE] rounded-lg p-4 font-mono leading-relaxed">
-                {streamText}
-              </pre>
             </div>
           )}
 

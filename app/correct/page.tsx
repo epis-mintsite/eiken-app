@@ -4,37 +4,15 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import UploadDropzone from "@/components/UploadDropzone";
 import { compressImage } from "@/lib/image-compress";
+import { useAuth } from "@/components/AuthProvider";
 
 type TabType = "writing" | "summary";
 
 function CorrectPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const initialTab = searchParams.get("tab") === "summary" ? "summary" : "writing";
-
-  // メンテナンス中は早期リターン
-  if (true) {
-    return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
-        <div className="max-w-md w-full bg-[#FFF8E1] border border-[#FFE082] rounded-2xl p-8 text-center">
-          <p className="text-4xl mb-4">🔧</p>
-          <h2 className="text-lg font-semibold text-[#7B5800] mb-2">
-            現在サービスを一時停止しています
-          </h2>
-          <p className="text-sm text-[#9B7A00] leading-relaxed">
-            コンテンツ更新のため、添削機能を一時的に停止しています。<br />
-            再開後に改めてご利用ください。
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="mt-6 text-sm text-[#6C5CE7] hover:underline"
-          >
-            ← トップページへ戻る
-          </button>
-        </div>
-      </div>
-    );
-  }
   const [tab, setTab] = useState<TabType>(initialTab);
 
   useEffect(() => {
@@ -46,14 +24,12 @@ function CorrectPageInner() {
 
   // Writing state
   const [file, setFile] = useState<File | null>(null);
-  const [studentName, setStudentName] = useState("");
   const [topic, setTopic] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
   // Summary state
   const [passageFile, setPassageFile] = useState<File | null>(null);
   const [answerFile, setAnswerFile] = useState<File | null>(null);
-  const [summaryStudentName, setSummaryStudentName] = useState("");
   const [summaryDate, setSummaryDate] = useState(
     new Date().toISOString().slice(0, 10)
   );
@@ -65,7 +41,7 @@ function CorrectPageInner() {
   const [error, setError] = useState("");
   const [useStreaming, setUseStreaming] = useState(true);
 
-  const canSubmitWriting = file && studentName.trim() && topic.trim() && !loading;
+  const canSubmitWriting = file && topic.trim() && !loading;
   const canSubmitSummary = passageFile && answerFile && !loading;
   const canSubmit = tab === "writing" ? canSubmitWriting : canSubmitSummary;
 
@@ -84,14 +60,14 @@ function CorrectPageInner() {
 
   // --- Writing submission ---
   async function handleWritingSubmit() {
-    if (!file || !studentName.trim() || !topic.trim()) return;
+    if (!file || !topic.trim()) return;
 
     setProgress("画像を圧縮中...");
     const compressed = await compressImage(file);
 
     const formData = new FormData();
     formData.append("image", compressed);
-    formData.append("studentName", studentName);
+    formData.append("studentName", user?.name || "未入力");
     formData.append("topic", topic);
     formData.append("date", date);
 
@@ -143,7 +119,7 @@ function CorrectPageInner() {
     const formData = new FormData();
     formData.append("passageImage", compressedPassage);
     formData.append("answerImage", compressedAnswer);
-    formData.append("studentName", summaryStudentName);
+    formData.append("studentName", user?.name || "未入力");
     formData.append("date", summaryDate);
 
     try {
@@ -343,7 +319,7 @@ function CorrectPageInner() {
                 : "text-[#9B9A97] hover:text-[#37352F]"
             }`}
           >
-            英作文添削
+            ライティング添削
             {tab === "writing" && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#37352F]" />
             )}
@@ -370,18 +346,6 @@ function CorrectPageInner() {
               <UploadDropzone file={file} onFileSelect={setFile} />
 
               <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                    生徒名（ユーザーID） <span className="text-[#EB5757]">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                    placeholder="山田太郎"
-                    className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
-                  />
-                </div>
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                     TOPIC <span className="text-[#EB5757]">*</span>
@@ -444,18 +408,6 @@ function CorrectPageInner() {
               <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                    生徒名（ユーザーID）
-                  </label>
-                  <input
-                    type="text"
-                    value={summaryStudentName}
-                    onChange={(e) => setSummaryStudentName(e.target.value)}
-                    placeholder="山田太郎"
-                    className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                     日付
                   </label>
                   <input
@@ -469,31 +421,9 @@ function CorrectPageInner() {
             </>
           )}
 
-          {/* Shared options */}
-          <label className="flex items-center gap-2.5 text-sm text-[#37352F] cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={useStreaming}
-              onChange={(e) => setUseStreaming(e.target.checked)}
-              className="rounded accent-[#6C5CE7] w-4 h-4"
-            />
-            リアルタイム表示（ストリーミング）
-          </label>
-
           {error && (
             <div className="bg-[#FFF3E8] border border-[#EB5757]/30 text-[#EB5757] rounded-lg p-4 text-sm">
               {error}
-            </div>
-          )}
-
-          {loading && streamText && (
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
-              <h3 className="text-sm font-medium text-[#6B6B6B] mb-3">
-                添削結果（リアルタイム）
-              </h3>
-              <pre className="text-xs text-[#37352F] whitespace-pre-wrap max-h-60 overflow-y-auto bg-[#FBFBFA] border border-[#E3E2DE] rounded-lg p-4 font-mono leading-relaxed">
-                {streamText}
-              </pre>
             </div>
           )}
 

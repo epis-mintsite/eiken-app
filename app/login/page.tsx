@@ -2,36 +2,27 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, signUp } from "@/lib/auth";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const { login } = useAuth();
+  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setMessage("");
 
     try {
-      if (mode === "login") {
-        await signIn(email, password);
-        router.push("/");
-      } else {
-        await signUp(email, password);
-        setMessage(
-          "確認メールを送信しました。メール内のリンクをクリックしてアカウントを有効化してください。"
-        );
-      }
+      await login(loginId, password);
+      router.push("/");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "認証に失敗しました"
+        err instanceof Error ? err.message : "ログインに失敗しました"
       );
     } finally {
       setLoading(false);
@@ -45,45 +36,25 @@ export default function LoginPage() {
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">
             準一級ライティング添削
           </h1>
-          <p className="text-sm text-[#9B9A97] mt-1">教師アカウントでログイン</p>
+          <p className="text-sm text-[#9B9A97] mt-1">
+            アカウントにログインしてください
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
-          {/* Tab */}
-          <div className="flex border-b border-[#E3E2DE]">
-            <button
-              onClick={() => setMode("login")}
-              className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-                mode === "login"
-                  ? "text-[#37352F] border-b-2 border-[#37352F]"
-                  : "text-[#9B9A97] hover:text-[#6B6B6B]"
-              }`}
-            >
-              ログイン
-            </button>
-            <button
-              onClick={() => setMode("signup")}
-              className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-                mode === "signup"
-                  ? "text-[#37352F] border-b-2 border-[#37352F]"
-                  : "text-[#9B9A97] hover:text-[#6B6B6B]"
-              }`}
-            >
-              新規登録
-            </button>
-          </div>
-
+        <div className="bg-white rounded-xl border border-[#E3E2DE] p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                メールアドレス
+                ログインID
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
                 required
-                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
+                autoComplete="username"
+                placeholder="ログインIDを入力"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none transition-colors"
               />
             </div>
             <div>
@@ -95,8 +66,9 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
-                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none"
+                autoComplete="current-password"
+                placeholder="パスワードを入力"
+                className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none transition-colors"
               />
             </div>
 
@@ -105,25 +77,27 @@ export default function LoginPage() {
                 {error}
               </p>
             )}
-            {message && (
-              <p className="text-sm text-[#4CAF50] bg-[#4CAF50]/5 rounded-lg p-2.5">
-                {message}
-              </p>
-            )}
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+              disabled={loading || !loginId.trim() || !password}
+              className="w-full bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-[#5A4BD1] disabled:bg-[#CFCDC9] disabled:cursor-not-allowed transition-colors"
             >
-              {loading
-                ? "処理中..."
-                : mode === "login"
-                  ? "ログイン"
-                  : "アカウント作成"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  ログイン中...
+                </span>
+              ) : (
+                "ログイン"
+              )}
             </button>
           </form>
         </div>
+
+        <p className="text-xs text-[#9B9A97] text-center mt-4">
+          アカウントは管理者が作成します
+        </p>
       </div>
     </div>
   );

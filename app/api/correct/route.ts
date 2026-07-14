@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ocrFromImage, correctEssay, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { supabase } from "@/lib/supabase";
+import { sendSlackNotification } from "@/lib/slack";
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,6 +87,16 @@ export async function POST(request: NextRequest) {
     } catch {
       // DB 未設定の場合はスキップ
     }
+
+    // Slack通知（非同期、エラーでもブロックしない）
+    sendSlackNotification({
+      type: "writing",
+      studentName,
+      date: date || new Date().toISOString().slice(0, 10),
+      topic,
+      scores: result.scores,
+      correctionId: recordId || undefined,
+    }).catch((err) => console.error("Slack notification error:", err));
 
     return NextResponse.json({
       id: recordId,

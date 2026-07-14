@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ocrFromImage, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { buildCorrectionPrompt } from "@/lib/prompt-builder";
 import { supabase } from "@/lib/supabase";
+import { sendSlackNotification } from "@/lib/slack";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -165,6 +166,16 @@ export async function POST(request: NextRequest) {
           advice: result.advice,
           word_count: wordCount,
         });
+
+        // Slack通知（非同期、エラーでもブロックしない）
+        sendSlackNotification({
+          type: "writing",
+          studentName,
+          date: date || new Date().toISOString().slice(0, 10),
+          topic,
+          scores: result.scores,
+          correctionId: recordId || undefined,
+        }).catch((err) => console.error("Slack notification error:", err));
       } catch (error) {
         send("error", { message: friendlyAIErrorMessage(error) });
       } finally {
