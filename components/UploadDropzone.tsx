@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import { useDropzone } from "react-dropzone";
+import { useCallback, useRef, useState } from "react";
+import { useDropzone, FileRejection } from "react-dropzone";
 
 interface Props {
   file: File | null;
@@ -14,29 +14,50 @@ export default function UploadDropzone({
   file,
   onFileSelect,
   label = "答案の写真をドラッグ＆ドロップ",
-  description = "またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）",
+  description = "またはクリックしてファイルを選択（JPG / PNG / WebP / HEIC、最大25MB）",
 }: Props) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [rejectError, setRejectError] = useState("");
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
+        setRejectError("");
         onFileSelect(acceptedFiles[0]);
       }
     },
     [onFileSelect]
   );
 
+  const onDropRejected = useCallback((rejections: FileRejection[]) => {
+    const rejection = rejections[0];
+    const code = rejection?.errors[0]?.code;
+    const sizeMB = rejection ? (rejection.file.size / 1024 / 1024).toFixed(1) : "?";
+    if (code === "file-too-large") {
+      setRejectError(
+        `ファイルサイズが大きすぎます（${sizeMB} MB）。25MB以下の画像を選択してください。`
+      );
+    } else if (code === "file-invalid-type") {
+      setRejectError(
+        "対応していないファイル形式です。JPG / PNG / WebP / HEIC の画像を選択してください。"
+      );
+    } else {
+      setRejectError("ファイルを読み込めませんでした。別の画像でお試しください。");
+    }
+  }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
+    onDropRejected,
+    accept: { "image/*": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"] },
     maxFiles: 1,
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 25 * 1024 * 1024,
   });
 
   function handleCameraCapture(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (files && files.length > 0) {
+      setRejectError("");
       onFileSelect(files[0]);
     }
   }
@@ -82,6 +103,12 @@ export default function UploadDropzone({
           </div>
         )}
       </div>
+
+      {rejectError && (
+        <p className="text-sm text-[#EB5757] bg-[#FFF3F3] border border-[#EB5757]/30 rounded-lg px-4 py-3">
+          {rejectError}
+        </p>
+      )}
 
       {/* モバイルカメラ撮影ボタン */}
       <button

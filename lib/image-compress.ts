@@ -8,8 +8,10 @@ export async function compressImage(
   maxDimension = 1600,
   quality = 0.8
 ): Promise<File> {
-  // 既に1MB以下なら圧縮不要
-  if (file.size <= 1024 * 1024) {
+  // JPEG/PNG/WebP かつ1MB以下ならそのまま送信可
+  // （HEIC等はAI処理が非対応のため、サイズに関わらずJPEGへ変換する）
+  const passthroughTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (file.size <= 1024 * 1024 && passthroughTypes.includes(file.type)) {
     return file;
   }
 
@@ -64,7 +66,15 @@ export async function compressImage(
 
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("画像の読み込みに失敗しました"));
+      const isHeic =
+        /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+      reject(
+        new Error(
+          isHeic
+            ? "この環境ではHEIC形式を読み込めませんでした。iPhoneの設定＞カメラ＞フォーマットを「互換性優先」にするか、JPGに変換してからアップロードしてください。"
+            : "画像の読み込みに失敗しました。別の画像でお試しください。"
+        )
+      );
     };
 
     img.src = url;

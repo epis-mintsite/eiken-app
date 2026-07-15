@@ -386,7 +386,7 @@ function CorrectPageInner() {
                     file={passageFile}
                     onFileSelect={setPassageFile}
                     label="課題文（英文パッセージ）の写真をドラッグ＆ドロップ"
-                    description="またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）"
+                    description="またはクリックしてファイルを選択（JPG / PNG / WebP / HEIC、最大25MB）"
                   />
                   <p className="mt-1.5 text-xs text-[#9B9A97]">
                     ※ 著作権保護のため、実際の英検®過去問題や市販教材の課題文のアップロードはお控えください。
@@ -400,7 +400,7 @@ function CorrectPageInner() {
                     file={answerFile}
                     onFileSelect={setAnswerFile}
                     label="生徒の解答（要約文）の写真をドラッグ＆ドロップ"
-                    description="またはクリックしてファイルを選択（JPG / PNG / WebP、最大10MB）"
+                    description="またはクリックしてファイルを選択（JPG / PNG / WebP / HEIC、最大25MB）"
                   />
                 </div>
               </div>
