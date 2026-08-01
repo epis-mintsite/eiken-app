@@ -88,7 +88,7 @@ const STRICTNESS_PROMPTS: Record<string, string> = {
   standard:
     "\n\n【採点方針】標準 — 4観点の採点基準に基づいて公平に採点してください。",
   strict:
-    "\n\n【採点方針】厳しめ — 準一級上位合格を意識し、語彙・文法・構成の細部まで厳密に評価。スコアは厳しめに付けてください。",
+    "\n\n【採点方針】厳しめ — 上位合格を意識し、語彙・文法・構成の細部まで厳密に評価。スコアは厳しめに付けてください。",
 };
 
 export function buildSummaryPrompt(

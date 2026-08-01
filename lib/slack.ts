@@ -122,7 +122,7 @@ export async function sendSlackNotification(params: SlackNotifyParams): Promise<
     elements: [
       {
         type: "mrkdwn",
-        text: `準一級ライティング添削 • ${new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`,
+        text: `上級ライティング添削 • ${new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}`,
       },
     ],
   });

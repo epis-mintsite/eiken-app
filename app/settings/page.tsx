@@ -116,7 +116,7 @@ export default function SettingsPage() {
             {settings.strictness === "lenient"
               ? "【採点方針】やさしめ — 良い点を積極的に評価し、基本的なミスのみ指摘。スコアは甘めに付けてください。"
               : settings.strictness === "strict"
-                ? "【採点方針】厳しめ — 準一級上位合格を意識し、語彙・文法・構成の細部まで厳密に評価。スコアは厳しめに付けてください。"
+                ? "【採点方針】厳しめ — 上位合格を意識し、語彙・文法・構成の細部まで厳密に評価。スコアは厳しめに付けてください。"
                 : "【採点方針】標準 — 4観点（内容・構成・語彙・文法）の採点基準に基づいて公平に採点してください。"}
             {settings.customInstructions &&
               `\n\n【追加指示】\n${settings.customInstructions}`}
