@@ -3,16 +3,12 @@ import { TERMS_VERSION } from "@/lib/terms-version";
 /**
  * 利用規約の本文（たたき台）。
  *
- * ★ 公開前に必ず確認・記入すること:
- *   - OPERATOR_NAME / CONTACT / GOVERNING_LAW を実際の内容に置き換える
- *   - 法的な最終確認は弁理士・弁護士等の専門家に依頼することを推奨
+ * 法的な最終確認は弁理士・弁護士等の専門家に依頼することを推奨。
  *
  * 本文を変更したら、lib/terms-version.ts の TERMS_VERSION も更新すること
  * （更新すると全利用者が次回アクセス時に再同意する）。
  */
-export const OPERATOR_NAME = "【運営者名を記載】";
-export const CONTACT = "【連絡先（メールアドレス等）を記載】";
-export const GOVERNING_LAW = "【準拠法・管轄裁判所を記載（例：日本法、運営者の所在地を管轄する裁判所）】";
+export const OPERATOR_NAME = "epis Education Centre";
 
 export interface TermsSection {
   heading: string;
@@ -100,14 +96,6 @@ export const TERMS_SECTIONS: TermsSection[] = [
     paragraphs: [
       "運営者は、必要に応じて本規約を変更できます。変更後の規約は、本サービス上に掲示した時点から効力を生じ、変更後に本サービスを利用する場合は、改めて同意をお願いすることがあります。",
     ],
-  },
-  {
-    heading: "第12条（準拠法・管轄）",
-    paragraphs: [`本規約は${GOVERNING_LAW}に従います。`],
-  },
-  {
-    heading: "第13条（お問い合わせ）",
-    paragraphs: [`本サービスに関するお問い合わせは、${CONTACT}までご連絡ください。`],
   },
 ];
 
