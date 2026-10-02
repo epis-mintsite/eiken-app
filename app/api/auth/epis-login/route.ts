@@ -107,9 +107,7 @@ export async function POST(req: NextRequest) {
   // 4. セッション発行
   await createSession(user as { id: string; login_id: string; name: string; role: string }, TERMS_VERSION);
 
-  const res = NextResponse.json({
+  return NextResponse.json({
     user: { id: user.id, loginId: user.login_id, name: user.name, role: user.role },
   });
-  res.cookies.delete(TERMS_COOKIE);
-  return res;
 }

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, createSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
-import { TERMS_VERSION, TERMS_COOKIE } from "@/lib/terms-version";
+import { TERMS_VERSION, TERMS_COOKIE, TERMS_COOKIE_MAX_AGE } from "@/lib/terms-version";
 import { signTermsCookie } from "@/lib/terms-cookie";
 import { currentTermsHash, recordConsent } from "@/lib/consent";
 
 /**
  * 利用規約への同意。
- *  - 未ログイン: 署名付きCookie（24時間）を発行 → /login へ。
- *                同意の記録はログイン成功時にアカウントへ紐づけて保存する。
+ *  - 未ログイン: 署名付きCookie（1年）を発行 → /login へ。同じ端末では次回から規約画面を出さない。
+ *                同意の記録はログイン成功時にアカウントへ紐づけて保存する（版ごとに初回のみ）。
  *  - ログイン中（規約の改定による再同意）: 同意履歴を保存し、セッションを新しい版で再発行。
  */
 export async function POST(req: NextRequest) {
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24,
+    maxAge: TERMS_COOKIE_MAX_AGE,
   });
   return res;
 }

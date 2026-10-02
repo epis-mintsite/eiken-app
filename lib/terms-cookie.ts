@@ -11,7 +11,7 @@ export async function signTermsCookie(termsHash: string): Promise<string> {
   return new SignJWT({ purpose: PURPOSE, v: TERMS_VERSION, h: termsHash })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("24h")
+    .setExpirationTime("365d")
     .sign(getKey());
 }
 

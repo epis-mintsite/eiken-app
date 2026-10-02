@@ -18,6 +18,7 @@ export function clientMeta(req: NextRequest): { ip: string | null; userAgent: st
 
 /**
  * 同意履歴を1件追記する（更新・削除はしない）。
+ * 同じ利用者が現行の版に同意した記録がすでにあれば、追加しない（版ごとに初回のみ記録）。
  * @param termsHash 利用者が同意した時点の本文ハッシュ（ログイン前同意ではCookieに入っていた値）
  */
 export async function recordConsent(params: {
@@ -28,6 +29,14 @@ export async function recordConsent(params: {
 }): Promise<{ ok: true } | { ok: false; message: string }> {
   const { user, source, termsHash, req } = params;
   const { ip, userAgent } = clientMeta(req);
+
+  const { data: already } = await supabase
+    .from("terms_consents")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("terms_version", TERMS_VERSION)
+    .limit(1);
+  if (already && already.length > 0) return { ok: true };
 
   const { error } = await supabase.from("terms_consents").insert({
     user_id: user.id,

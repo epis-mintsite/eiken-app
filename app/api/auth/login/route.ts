@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     await createSession(user, TERMS_VERSION);
 
-    const res = NextResponse.json({
+    return NextResponse.json({
       user: {
         id: user.id,
         loginId: user.login_id,
@@ -60,9 +60,6 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
     });
-    // ログイン前同意のCookieは役目を終えたので破棄
-    res.cookies.delete(TERMS_COOKIE);
-    return res;
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "認証に失敗しました" },
