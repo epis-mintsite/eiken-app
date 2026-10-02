@@ -63,24 +63,8 @@ export async function POST(request: NextRequest) {
       .split(/\s+/)
       .filter((w) => w.length > 0).length;
 
-    // 3. 画像を Supabase Storage にアップロード
-    let imageUrl: string | null = null;
-    try {
-      const fileName = `${Date.now()}_${image.name}`;
-      const bucketName = process.env.STORAGE_BUCKET_NAME || "eiken-files";
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, buffer, { contentType: image.type });
-
-      if (!uploadError && uploadData) {
-        const { data: urlData } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(uploadData.path);
-        imageUrl = urlData.publicUrl;
-      }
-    } catch {
-      // ストレージ未設定の場合はスキップ
-    }
+    // 3. 答案の写真は保存しない（OCRした文字と採点結果のみ保存する）
+    const imageUrl: string | null = null;
 
     // 4. DB に保存
     let recordId: string | null = null;
