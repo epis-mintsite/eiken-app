@@ -167,7 +167,7 @@ export default function LoginPage() {
         <p className="text-xs text-[#9B9A97] text-center mt-4">
           {isEpis ? (
             <>
-              ミントサイトと同じIDとパスワードを使います（生徒・先生）
+              ミントサイトと同じIDとパスワードを使います
               <br />
               <button
                 type="button"

@@ -19,7 +19,7 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
   if (body.name !== undefined) updates.name = body.name.trim();
   if (body.role !== undefined) {
-    if (!["admin", "teacher"].includes(body.role)) {
+    if (!["admin", "teacher", "user"].includes(body.role)) {
       return NextResponse.json({ error: "無効な権限です" }, { status: 400 });
     }
     updates.role = body.role;

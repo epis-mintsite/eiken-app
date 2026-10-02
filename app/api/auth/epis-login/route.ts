@@ -5,12 +5,7 @@ import { createSession } from "@/lib/session";
 import { TERMS_VERSION, TERMS_COOKIE } from "@/lib/terms-version";
 import { verifyTermsCookie } from "@/lib/terms-cookie";
 import { recordConsent } from "@/lib/consent";
-import {
-  verifyFirebaseIdToken,
-  episUserIdFromEmail,
-  getEpisUserInfo,
-  roleFromEpisType,
-} from "@/lib/epis-auth";
+import { verifyFirebaseIdToken, episUserIdFromEmail } from "@/lib/epis-auth";
 
 interface DbUser {
   id: string;
@@ -29,7 +24,8 @@ function fail(status: number, error: string) {
 /**
  * ミントサイトのIDでのログイン。
  * ブラウザがFirebaseで本人確認して受け取ったIDトークンを検証し、
- * 利用者種別（先生・保護者・生徒）に応じてこのアプリの利用者を作成・更新してセッションを発行する。
+ * このアプリの利用者を探して（初回は「生徒」として作成して）セッションを発行する。
+ * ミントサイトのIDでログインできる人は全員利用できる。講師への変更は管理者が管理画面で行う。
  */
 export async function POST(req: NextRequest) {
   // 規約に同意していなければログインさせない
@@ -52,14 +48,7 @@ export async function POST(req: NextRequest) {
   const episUserId = episUserIdFromEmail(verified.email);
   if (!episUserId) return fail(401, "ミントサイトのアカウントではありません。");
 
-  // 2. 利用者種別の取得 → 権限の決定
-  const info = await getEpisUserInfo(episUserId, idToken);
-  const decided = roleFromEpisType(info.userType);
-  if (decided === "denied") {
-    return fail(403, "保護者のアカウントでは、この添削アプリはご利用いただけません。");
-  }
-
-  // 3. このアプリの利用者を探す（ミントサイトのIDで照合。ログインIDでは照合しない）
+  // 2. このアプリの利用者を探す（ミントサイトのIDで照合。ログインIDでは照合しない）
   const { data: existing } = await supabase
     .from("users")
     .select(USER_COLUMNS)
@@ -73,24 +62,17 @@ export async function POST(req: NextRequest) {
     if (existing.is_active === false) {
       return fail(403, "このアカウントは無効化されています。");
     }
-    // 権限はミントサイトの種別に追従する（管理者が手動で admin にした場合はそのまま）
-    const role = existing.role === "admin" ? "admin" : (decided ?? existing.role);
-    if (role !== existing.role) {
-      await supabase.from("users").update({ role, updated_at: new Date().toISOString() }).eq("id", existing.id);
-    }
-    user = { ...existing, role };
+    // 権限・氏名は管理画面での設定を優先する（ログインのたびに上書きしない）
+    user = existing;
   } else {
-    // 初回ログイン: 種別が確認できない場合は作成しない（保護者の誤登録を防ぐ）
-    if (!decided) {
-      return fail(503, "ミントサイトの利用者情報を取得できませんでした。しばらくしてから、もう一度お試しください。");
-    }
+    // 初回ログイン: 「生徒」として作成する
     const { data: created, error } = await supabase
       .from("users")
       .insert({
         login_id: `epis:${episUserId}`, // 自前のログインIDと衝突しないよう接頭辞を付ける
         password_hash: `!${randomUUID()}`, // パスワードでのログインは不可（ミントサイトで認証する）
-        name: info.name || episUserId,
-        role: decided,
+        name: episUserId, // 氏名は管理画面で設定できる
+        role: "user",
         is_active: true,
         auth_provider: "epis",
         external_id: episUserId,
@@ -116,13 +98,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 4. 同意の記録（記録できなければログインさせない）
+  // 3. 同意の記録（記録できなければログインさせない）
   const recorded = await recordConsent({ user, source: "pre-login", termsHash: consent.hash, req });
   if (!recorded.ok) {
     return fail(500, "同意の記録に失敗しました。時間をおいて、もう一度お試しください。");
   }
 
-  // 5. セッション発行
+  // 4. セッション発行
   await createSession(user as { id: string; login_id: string; name: string; role: string }, TERMS_VERSION);
 
   const res = NextResponse.json({
