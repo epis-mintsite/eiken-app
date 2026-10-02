@@ -185,7 +185,7 @@ export async function generatePdfReport(data: PdfInput): Promise<Buffer> {
     margins: { top: PAGE.margin, bottom: PAGE.margin, left: PAGE.margin, right: PAGE.margin },
     info: {
       Title: `添削レポート - ${data.student_name}`,
-      Author: "上級ライティング添削",
+      Author: "AIライティング添削",
     },
   });
 
@@ -205,7 +205,7 @@ export async function generatePdfReport(data: PdfInput): Promise<Buffer> {
 
   // ---- Title ----
   doc.font("NotoSansBold").fontSize(18).fillColor(COLORS.dark)
-    .text(isSummary ? "上級 要約添削レポート" : "上級ライティング添削レポート", PAGE.margin, y);
+    .text(isSummary ? "AI要約添削レポート" : "AIライティング添削レポート", PAGE.margin, y);
   y += 28;
 
   // ---- Meta ----
@@ -409,7 +409,7 @@ export async function generatePdfReport(data: PdfInput): Promise<Buffer> {
     doc.switchToPage(i);
     doc.font("NotoSansRegular").fontSize(7).fillColor(COLORS.lightGray)
       .text(
-        `上級 添削レポート — Page ${i + 1} / ${totalPages}`,
+        `AI添削レポート — Page ${i + 1} / ${totalPages}`,
         PAGE.margin,
         PAGE.height - 35,
         { width: PAGE.contentWidth, align: "center" }

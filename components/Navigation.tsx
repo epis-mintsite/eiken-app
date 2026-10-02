@@ -57,7 +57,7 @@ export default function Navigation() {
             className="flex items-center gap-2 shrink-0"
           >
             <span className="text-[#37352F] font-semibold text-base tracking-tight">
-              上級ライティング添削
+              AIライティング添削
             </span>
           </Link>
 

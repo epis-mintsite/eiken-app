@@ -42,7 +42,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
   // Title
   doc.setFontSize(20);
   doc.setFont("Helvetica", "bold");
-  doc.text("Advanced Writing Report", margin, y);
+  doc.text("AI Writing Report", margin, y);
   y += 10;
 
   // Student info
@@ -198,7 +198,7 @@ export function generatePdf(data: PdfInput): Promise<Buffer> {
     doc.setFont("Helvetica", "normal");
     doc.setTextColor(150);
     doc.text(
-      `Advanced Writing Report - Page ${i}/${pageCount}`,
+      `AI Writing Report - Page ${i}/${pageCount}`,
       pageWidth / 2,
       290,
       { align: "center" }

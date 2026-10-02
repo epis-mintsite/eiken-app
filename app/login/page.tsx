@@ -102,7 +102,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm mx-4">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">
-            上級ライティング添削
+            AIライティング添削
           </h1>
           <p className="text-sm text-[#9B9A97] mt-1">
             {isEpis ? "ミントサイトのIDとパスワードでログイン" : "管理者ログイン"}

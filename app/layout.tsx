@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "上級ライティング添削",
+  title: "AIライティング添削",
   description: "手書き答案の写真をアップロードして自動添削・採点",
 };
 

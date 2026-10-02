@@ -61,7 +61,7 @@ export default function DashboardPage() {
         <div className="border-b border-[#E3E2DE] py-10">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-              上級ライティング添削
+              AIライティング添削
             </h1>
             <p className="mt-1 text-sm text-[#9B9A97]">
               手書き答案の自動添削・採点システム（英検®準一級レベル対応）
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         <div className="border-b border-[#E3E2DE] py-10">
           <div className="max-w-3xl mx-auto px-4">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-              上級ライティング添削
+              AIライティング添削
             </h1>
             <p className="mt-1 text-sm text-[#9B9A97]">
               手書き答案の自動添削・採点システム（英検®準一級レベル対応）
@@ -208,7 +208,7 @@ export default function DashboardPage() {
       <div className="border-b border-[#E3E2DE] py-10">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-            上級ライティング添削
+            AIライティング添削
           </h1>
           <p className="mt-1 text-sm text-[#9B9A97]">
             手書き答案の自動添削・採点システム（英検®準一級レベル対応）
