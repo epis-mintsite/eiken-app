@@ -8,6 +8,8 @@ export interface SessionPayload {
   name: string;
   role: string;
   expiresAt: Date;
+  /** 同意済みの利用規約の版（現行版と違えば再同意が必要） */
+  termsVersion?: string;
 }
 
 const secretKey = process.env.JWT_SECRET;
@@ -28,24 +30,37 @@ export async function decrypt(
     const { payload } = await jwtVerify(session, encodedKey, {
       algorithms: ["HS256"],
     });
+    // 同じ秘密鍵で署名した別用途のトークン（規約同意Cookie等）をセッションとして
+    // 受け付けないよう、必須項目の形を検証する。
+    if (
+      typeof payload.userId !== "string" ||
+      typeof payload.loginId !== "string" ||
+      typeof payload.role !== "string"
+    ) {
+      return null;
+    }
     return {
-      userId: payload.userId as string,
-      loginId: payload.loginId as string,
-      name: payload.name as string,
-      role: payload.role as string,
+      userId: payload.userId,
+      loginId: payload.loginId,
+      name: String(payload.name ?? ""),
+      role: payload.role,
       expiresAt: new Date(payload.expiresAt as string),
+      termsVersion: typeof payload.termsVersion === "string" ? payload.termsVersion : undefined,
     };
   } catch {
     return null;
   }
 }
 
-export async function createSession(user: {
-  id: string;
-  login_id: string;
-  name: string;
-  role: string;
-}): Promise<void> {
+export async function createSession(
+  user: {
+    id: string;
+    login_id: string;
+    name: string;
+    role: string;
+  },
+  termsVersion: string
+): Promise<void> {
   const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
   const session = await encrypt({
     userId: user.id,
@@ -53,6 +68,7 @@ export async function createSession(user: {
     name: user.name,
     role: user.role,
     expiresAt,
+    termsVersion,
   });
 
   const cookieStore = await cookies();

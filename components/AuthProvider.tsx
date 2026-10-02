@@ -69,7 +69,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error || "ログインに失敗しました");
+      const err = new Error(data.error || "ログインに失敗しました") as Error & { code?: string };
+      err.code = data.code;
+      throw err;
     }
 
     const data = await res.json();

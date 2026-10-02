@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
@@ -28,12 +29,11 @@ export default function RootLayout({
         <AuthProvider>
           <Navigation />
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-[#E3E2DE] py-6 bg-white">
-            <div className="max-w-4xl mx-auto px-4 text-xs text-[#9B9A97] leading-relaxed space-y-1">
-              <p>
-                本サービスは、公益財団法人 日本英語検定協会とは無関係であり、同協会の承認・推奨を受けたものではありません。
-              </p>
-              <p>英検®は、公益財団法人 日本英語検定協会の登録商標です。</p>
+          <footer className="border-t border-[#E3E2DE] py-5 bg-white">
+            <div className="max-w-4xl mx-auto px-4 text-xs text-[#9B9A97] text-center">
+              <Link href="/terms" className="hover:underline">
+                利用規約
+              </Link>
             </div>
           </footer>
         </AuthProvider>

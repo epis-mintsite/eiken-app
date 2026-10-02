@@ -10,12 +10,24 @@ interface User {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  consent: { terms_version: string; agreed_at: string } | null;
+}
+
+function consentLabel(user: User, currentVersion: string) {
+  if (!user.consent) return { text: "未同意", ok: false };
+  const d = new Date(user.consent.agreed_at).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+  });
+  const ok = user.consent.terms_version === currentVersion;
+  return { text: `${d}（版 ${user.consent.terms_version}）${ok ? "" : "・要再同意"}`, ok };
 }
 
 type ModalType = "add" | "edit" | "resetPassword" | null;
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [currentTermsVersion, setCurrentTermsVersion] = useState("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
@@ -39,6 +51,7 @@ export default function AdminUsersPage() {
       if (!res.ok) throw new Error("取得に失敗しました");
       const data = await res.json();
       setUsers(data.users);
+      setCurrentTermsVersion(data.currentTermsVersion || "");
     } catch {
       setError("ユーザー一覧の取得に失敗しました");
     } finally {
@@ -226,6 +239,12 @@ export default function AdminUsersPage() {
               className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors"
             />
           </div>
+          <a
+            href="/api/admin/consents"
+            className="border border-[#E3E2DE] text-[#37352F] rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-[#F7F6F3] transition-colors whitespace-nowrap"
+          >
+            同意履歴をCSV出力
+          </a>
           <button
             onClick={openAddModal}
             className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-[#5A4BD1] transition-colors whitespace-nowrap"
@@ -257,6 +276,9 @@ export default function AdminUsersPage() {
                     </th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-[#9B9A97] uppercase tracking-wider">
                       状態
+                    </th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#9B9A97] uppercase tracking-wider">
+                      規約への同意
                     </th>
                     <th className="text-right px-4 py-3 text-xs font-medium text-[#9B9A97] uppercase tracking-wider">
                       操作
@@ -296,6 +318,11 @@ export default function AdminUsersPage() {
                         />
                         <span className="text-sm text-[#6B6B6B]">
                           {user.is_active ? "有効" : "無効"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <span className={consentLabel(user, currentTermsVersion).ok ? "text-[#4CAF50]" : "text-[#E67E22]"}>
+                          {consentLabel(user, currentTermsVersion).text}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -363,6 +390,9 @@ export default function AdminUsersPage() {
                       />
                     </div>
                   </div>
+                  <p className={`text-xs ${consentLabel(user, currentTermsVersion).ok ? "text-[#4CAF50]" : "text-[#E67E22]"}`}>
+                    規約：{consentLabel(user, currentTermsVersion).text}
+                  </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => openEditModal(user)}

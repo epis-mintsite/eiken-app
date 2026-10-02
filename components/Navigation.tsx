@@ -30,7 +30,7 @@ export default function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // ログイン画面ではナビゲーションを非表示
-  if (pathname === "/login") return null;
+  if (pathname === "/login" || (pathname === "/terms" && !user)) return null;
 
   async function handleSignOut() {
     await logout();

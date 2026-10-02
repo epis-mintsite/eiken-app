@@ -367,9 +367,6 @@ function CorrectPageInner() {
                     rows={3}
                     className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder-[#B4B4B0] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 focus:outline-none transition-colors resize-none"
                   />
-                  <p className="mt-1.5 text-xs text-[#9B9A97]">
-                    ※ 著作権保護のため、実際の英検®過去問題の入力はお控えください。オリジナルのTOPICをご利用ください。
-                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
@@ -398,9 +395,6 @@ function CorrectPageInner() {
                     label="課題文（英文パッセージ）の写真をドラッグ＆ドロップ"
                     description="またはクリックしてファイルを選択（JPG / PNG / WebP / HEIC、最大25MB）"
                   />
-                  <p className="mt-1.5 text-xs text-[#9B9A97]">
-                    ※ 著作権保護のため、実際の英検®過去問題や市販教材の課題文のアップロードはお控えください。
-                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-2">

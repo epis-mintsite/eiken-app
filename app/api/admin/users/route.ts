@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { hashPassword } from "@/lib/auth";
 import { verifyAdmin } from "@/lib/session";
+import { TERMS_VERSION } from "@/lib/terms-version";
 
 // ユーザー一覧取得
 export async function GET(req: NextRequest) {
@@ -27,7 +28,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ users: data });
+  // 各ユーザーの最新の同意（規約の版・日時）を付与する
+  const { data: consents } = await supabase
+    .from("terms_consents")
+    .select("user_id, terms_version, agreed_at")
+    .order("agreed_at", { ascending: false });
+  const latest = new Map<string, { terms_version: string; agreed_at: string }>();
+  for (const c of consents || []) {
+    if (!latest.has(c.user_id)) {
+      latest.set(c.user_id, { terms_version: c.terms_version, agreed_at: c.agreed_at });
+    }
+  }
+
+  const users = (data || []).map((u) => ({ ...u, consent: latest.get(u.id) ?? null }));
+  return NextResponse.json({ users, currentTermsVersion: TERMS_VERSION });
 }
 
 // 新規ユーザー作成

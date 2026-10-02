@@ -147,9 +147,6 @@ export default function BatchPage() {
             rows={2}
             className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none resize-none"
           />
-          <p className="mt-1.5 text-xs text-[#9B9A97]">
-            ※ 著作権保護のため、実際の英検®過去問題の入力はお控えください。オリジナルのTOPICをご利用ください。
-          </p>
         </div>
 
         {/* Dropzone */}

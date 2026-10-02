@@ -21,6 +21,11 @@ export default function LoginPage() {
       await login(loginId, password);
       router.push("/");
     } catch (err) {
+      // 規約への同意の有効期限（24時間）が切れた場合は、規約ページへ戻す
+      if ((err as { code?: string }).code === "TERMS_REQUIRED") {
+        window.location.href = "/terms";
+        return;
+      }
       setError(
         err instanceof Error ? err.message : "ログインに失敗しました"
       );
