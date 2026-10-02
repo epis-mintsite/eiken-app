@@ -3,6 +3,12 @@ import { ocrFromImage, correctEssay, friendlyAIErrorMessage } from "@/lib/anthro
 import { supabase } from "@/lib/supabase";
 import { sendSlackNotification } from "@/lib/slack";
 import { requireSession, canViewAll } from "@/lib/access";
+import {
+  validateImages,
+  countWords,
+  MAX_ANSWER_WORDS,
+  answerTooLongMessage,
+} from "@/lib/upload-guard";
 
 export async function POST(request: NextRequest) {
   const auth = await requireSession();
@@ -28,12 +34,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const imageError = validateImages([{ file: image, label: "答案の写真" }]);
+    if (imageError) {
+      return NextResponse.json({ error: imageError }, { status: 400 });
+    }
+
     const buffer = Buffer.from(await image.arrayBuffer());
     const imageBase64 = buffer.toString("base64");
-    const mediaType = image.type as "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+    const mediaType = image.type as "image/jpeg" | "image/png" | "image/webp";
 
     // 1. OCR
     const originalText = await ocrFromImage(imageBase64, mediaType);
+
+    // 1ページ分を超える内容は処理しない
+    const ocrWords = countWords(originalText);
+    if (ocrWords > MAX_ANSWER_WORDS) {
+      return NextResponse.json({ error: answerTooLongMessage(ocrWords) }, { status: 400 });
+    }
 
     // 2. 添削・採点
     const result = await correctEssay(originalText, topic, studentName, {

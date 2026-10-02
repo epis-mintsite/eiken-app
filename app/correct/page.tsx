@@ -88,7 +88,17 @@ function CorrectPageInner() {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) throw new Error("添削処理に失敗しました");
+      if (!res.ok) {
+        // サーバーが返した理由（サイズ超過・形式不正など）をそのまま表示する
+        let msg = "添削処理に失敗しました";
+        try {
+          const body = await res.json();
+          if (body.error) msg = body.error;
+        } catch {
+          if (res.status === 413) msg = "画像サイズが大きすぎます。より小さい画像を使用してください。";
+        }
+        throw new Error(msg);
+      }
       await processSSE(res, "writing");
     } else {
       setProgress("OCR処理中... 手書き文字を読み取っています");

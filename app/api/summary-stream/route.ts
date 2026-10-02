@@ -5,6 +5,14 @@ import { buildSummaryPrompt } from "@/lib/summary-prompt-builder";
 import { supabase } from "@/lib/supabase";
 import { sendSlackNotification } from "@/lib/slack";
 import { requireSession, canViewAll } from "@/lib/access";
+import {
+  validateImages,
+  countWords,
+  MAX_ANSWER_WORDS,
+  MAX_PASSAGE_WORDS,
+  answerTooLongMessage,
+  passageTooLongMessage,
+} from "@/lib/upload-guard";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -32,6 +40,17 @@ export async function POST(request: NextRequest) {
       JSON.stringify({ error: "課題文の写真と解答の写真は必須です" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
+  }
+
+  const imageError = validateImages([
+    { file: passageImage, label: "課題文の写真" },
+    { file: answerImage, label: "解答の写真" },
+  ]);
+  if (imageError) {
+    return new Response(JSON.stringify({ error: imageError }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const encoder = new TextEncoder();
@@ -62,6 +81,12 @@ export async function POST(request: NextRequest) {
 
         const passageText = await ocrFromImage(passageBase64, passageMediaType);
 
+        // 1ページ分を超える課題文（問題集の複数ページ等）は処理しない
+        const passageWords = countWords(passageText);
+        if (passageWords > MAX_PASSAGE_WORDS) {
+          throw new Error(passageTooLongMessage(passageWords));
+        }
+
         send("ocr-passage", { passage_text: passageText });
 
         // Step 2: OCR answer image
@@ -73,10 +98,10 @@ export async function POST(request: NextRequest) {
 
         const answerText = await ocrFromImage(answerBase64, answerMediaType);
 
-        const wordCount = answerText
-          .trim()
-          .split(/\s+/)
-          .filter((w: string) => w.length > 0).length;
+        const wordCount = countWords(answerText);
+        if (wordCount > MAX_ANSWER_WORDS) {
+          throw new Error(answerTooLongMessage(wordCount));
+        }
 
         send("ocr-answer", { answer_text: answerText, word_count: wordCount });
 
@@ -132,7 +157,8 @@ export async function POST(request: NextRequest) {
               topic: "英文要約",
               date,
               original_text: answerText,
-              passage_text: passageText,
+              // 課題文は著作物（問題集等）の可能性があるため、DBには保存しない
+              passage_text: null,
               image_url: null,
               strictness,
               score_content: result.scores.content,

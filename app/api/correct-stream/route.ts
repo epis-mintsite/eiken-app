@@ -5,6 +5,12 @@ import { buildCorrectionPrompt } from "@/lib/prompt-builder";
 import { supabase } from "@/lib/supabase";
 import { sendSlackNotification } from "@/lib/slack";
 import { requireSession, canViewAll } from "@/lib/access";
+import {
+  validateImages,
+  countWords,
+  MAX_ANSWER_WORDS,
+  answerTooLongMessage,
+} from "@/lib/upload-guard";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -32,6 +38,14 @@ export async function POST(request: NextRequest) {
       JSON.stringify({ error: "image, studentName, topic は必須です" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
+  }
+
+  const imageError = validateImages([{ file: image, label: "答案の写真" }]);
+  if (imageError) {
+    return new Response(JSON.stringify({ error: imageError }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const encoder = new TextEncoder();
@@ -62,10 +76,10 @@ export async function POST(request: NextRequest) {
 
         const originalText = await ocrFromImage(imageBase64, mediaType);
 
-        const wordCount = originalText
-          .trim()
-          .split(/\s+/)
-          .filter((w: string) => w.length > 0).length;
+        const wordCount = countWords(originalText);
+        if (wordCount > MAX_ANSWER_WORDS) {
+          throw new Error(answerTooLongMessage(wordCount));
+        }
 
         send("ocr", { original_text: originalText, word_count: wordCount });
 
