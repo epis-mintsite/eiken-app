@@ -4,6 +4,7 @@ import { ocrFromImage, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { buildCorrectionPrompt } from "@/lib/prompt-builder";
 import { supabase } from "@/lib/supabase";
 import { sendSlackNotification } from "@/lib/slack";
+import { requireSession, canViewAll } from "@/lib/access";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -11,9 +12,16 @@ const anthropic = new Anthropic({
 });
 
 export async function POST(request: NextRequest) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+  const { session } = auth;
+
   const formData = await request.formData();
   const image = formData.get("image") as File | null;
-  const studentName = formData.get("studentName") as string;
+  // 生徒アカウントは氏名をセッションから決める（講師・管理者は代理提出のため入力値を使う）
+  const studentName = canViewAll(session)
+    ? ((formData.get("studentName") as string) || session.name)
+    : session.name;
   const topic = formData.get("topic") as string;
   const date = formData.get("date") as string;
   const strictness = (formData.get("strictness") as string) || "standard";
@@ -124,6 +132,7 @@ export async function POST(request: NextRequest) {
           const { data: inserted, error: dbError } = await supabase
             .from("corrections")
             .insert({
+              user_id: session.userId,
               student_name: studentName,
               topic,
               date,

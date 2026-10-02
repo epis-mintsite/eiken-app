@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireSession, canViewAll } from "@/lib/access";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+  const { session } = auth;
+
   const { id } = await params;
 
   const { data, error } = await supabase
@@ -13,7 +18,8 @@ export async function GET(
     .eq("id", id)
     .single();
 
-  if (error || !data) {
+  // 他人の結果は「存在しない」として扱う（IDの存在を推測させない）
+  if (error || !data || (!canViewAll(session) && data.user_id !== session.userId)) {
     return NextResponse.json({ error: "添削結果が見つかりません" }, { status: 404 });
   }
 

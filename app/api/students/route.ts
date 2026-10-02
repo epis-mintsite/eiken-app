@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireStaff } from "@/lib/access";
 
 export async function GET() {
+  const auth = await requireStaff();
+  if (auth.error) return auth.error;
+
   try {
     const { data, error } = await supabase
       .from("students")
@@ -19,6 +23,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireStaff();
+  if (auth.error) return auth.error;
+
   try {
     const body = await request.json();
     const { name, grade } = body;
@@ -44,6 +51,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireStaff();
+  if (auth.error) return auth.error;
+
   try {
     const { id } = await request.json();
     if (!id) {

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireSession, canViewAll } from "@/lib/access";
 
-async function getStats(isSummary: boolean) {
+async function getStats(isSummary: boolean, onlyUserId: string | null) {
   let query = supabase
     .from("corrections")
     .select("student_name, score_content, score_org, score_vocab, score_grammar");
+
+  if (onlyUserId) {
+    query = query.eq("user_id", onlyUserId);
+  }
 
   if (isSummary) {
     query = query.eq("type", "summary");
@@ -32,10 +37,17 @@ async function getStats(isSummary: boolean) {
 }
 
 export async function GET() {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+  const { session } = auth;
+
+  // 生徒には自分の集計のみ返す
+  const onlyUserId = canViewAll(session) ? null : session.userId;
+
   try {
     const [summary, writing] = await Promise.all([
-      getStats(true),
-      getStats(false),
+      getStats(true, onlyUserId),
+      getStats(false, onlyUserId),
     ]);
     return NextResponse.json({ summary, writing });
   } catch {

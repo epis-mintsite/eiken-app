@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const publicPaths = ["/login", "/api/auth/login"];
+// /api/health は Vercel Cron 用（CRON_SECRET で保護）
+const publicPaths = ["/login", "/api/auth/login", "/api/health"];
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET);
 

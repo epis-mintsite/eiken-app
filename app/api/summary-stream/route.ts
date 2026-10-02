@@ -4,6 +4,7 @@ import { ocrFromImage, friendlyAIErrorMessage } from "@/lib/anthropic";
 import { buildSummaryPrompt } from "@/lib/summary-prompt-builder";
 import { supabase } from "@/lib/supabase";
 import { sendSlackNotification } from "@/lib/slack";
+import { requireSession, canViewAll } from "@/lib/access";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -11,10 +12,17 @@ const anthropic = new Anthropic({
 });
 
 export async function POST(request: NextRequest) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+  const { session } = auth;
+
   const formData = await request.formData();
   const passageImage = formData.get("passageImage") as File | null;
   const answerImage = formData.get("answerImage") as File | null;
-  const studentName = (formData.get("studentName") as string) || "";
+  // 生徒アカウントは氏名をセッションから決める（講師・管理者は代理提出のため入力値を使う）
+  const studentName = canViewAll(session)
+    ? ((formData.get("studentName") as string) || session.name)
+    : session.name;
   const date = (formData.get("date") as string) || new Date().toISOString().slice(0, 10);
   const strictness = (formData.get("strictness") as string) || "standard";
   const customInstructions = (formData.get("customInstructions") as string) || "";
@@ -119,6 +127,7 @@ export async function POST(request: NextRequest) {
             .from("corrections")
             .insert({
               type: "summary",
+              user_id: session.userId,
               student_name: studentName || "未入力",
               topic: "英文要約",
               date,

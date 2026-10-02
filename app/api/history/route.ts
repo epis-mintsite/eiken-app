@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireSession, canViewAll } from "@/lib/access";
 
 export async function GET(request: NextRequest) {
+  const auth = await requireSession();
+  if (auth.error) return auth.error;
+  const { session } = auth;
+
   const url = request.nextUrl;
   const limit = parseInt(url.searchParams.get("limit") || "20");
   const offset = parseInt(url.searchParams.get("offset") || "0");
@@ -26,6 +31,11 @@ export async function GET(request: NextRequest) {
       )
       .order(validSortBy, { ascending })
       .range(offset, offset + limit - 1);
+
+    // 生徒は自分の提出分のみ（講師・管理者は全件）
+    if (!canViewAll(session)) {
+      query = query.eq("user_id", session.userId);
+    }
 
     if (studentFilter) {
       query = query.ilike("student_name", `%${studentFilter}%`);

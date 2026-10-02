@@ -9,22 +9,22 @@
  *
  * 環境変数が必要:
  *   NEXT_PUBLIC_SUPABASE_URL
- *   NEXT_PUBLIC_SUPABASE_ANON_KEY
+ *   SUPABASE_SERVICE_ROLE_KEY（DBはRLSで施錠されているため、公開鍵では操作できません）
  */
 
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("❌ 環境変数 NEXT_PUBLIC_SUPABASE_URL と NEXT_PUBLIC_SUPABASE_ANON_KEY が必要です");
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error("❌ 環境変数 NEXT_PUBLIC_SUPABASE_URL と SUPABASE_SERVICE_ROLE_KEY が必要です");
   console.error("   .env.local ファイルに設定してください");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function main() {
   const [, , loginId, password, name] = process.argv;
