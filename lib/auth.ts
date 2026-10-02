@@ -20,6 +20,7 @@ export async function authenticateUser(
     .from("users")
     .select("id, login_id, password_hash, name, role, is_active")
     .eq("login_id", loginId)
+    .eq("auth_provider", "local") // ミントサイトの利用者は、パスワードではログインさせない
     .single();
 
   if (error || !user) {

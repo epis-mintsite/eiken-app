@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
 
     const user = await authenticateUser(loginId, password);
 
+    // このログイン方法は管理者（非常用）のみ。生徒・講師はミントサイトのIDでログインする。
+    if (user.role !== "admin") {
+      return NextResponse.json(
+        { error: "生徒・講師の方は、ミントサイトのIDとパスワードでログインしてください" },
+        { status: 403 }
+      );
+    }
+
     // 認証できたアカウントに、同意（同意時点の規約ハッシュ）を紐づけて記録する。
     // 記録できなければログインさせない（同意履歴を残せない状態で利用させない）。
     const recorded = await recordConsent({

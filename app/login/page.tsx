@@ -2,37 +2,100 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useAuth } from "@/components/AuthProvider";
+import { getFirebaseAuth } from "@/lib/firebase-client";
+
+type Mode = "epis" | "admin";
+
+// Firebaseのエラーコード → 利用者向けメッセージ
+function firebaseErrorMessage(code: string): string {
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+    case "auth/invalid-email":
+      return "IDまたはパスワードが正しくありません。";
+    case "auth/too-many-requests":
+      return "試行回数が多すぎます。しばらくしてから、もう一度お試しください。";
+    case "auth/network-request-failed":
+      return "通信エラーが発生しました。接続をご確認ください。";
+    case "auth/user-disabled":
+      return "このアカウントは無効化されています。";
+    default:
+      return `ログインに失敗しました（${code || "不明なエラー"}）`;
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithEpis } = useAuth();
+  const [mode, setMode] = useState<Mode>("epis");
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  function switchMode(next: Mode) {
+    setMode(next);
+    setLoginId("");
+    setPassword("");
+    setError("");
+  }
+
+  // ミントサイトと同じ入力ルール
+  function validateEpis(): string | null {
+    if (/\s/.test(loginId)) return "IDにスペースは使用できません。";
+    if (!/^[a-zA-Z0-9]+$/.test(loginId)) return "IDはアルファベットと数字のみ使用できます。";
+    if (/\s/.test(password)) return "パスワードにスペースは使用できません。";
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    if (mode === "epis") {
+      const invalid = validateEpis();
+      if (invalid) {
+        setError(invalid);
+        return;
+      }
+    }
+
+    setLoading(true);
     try {
-      await login(loginId, password);
+      if (mode === "epis") {
+        // ミントサイトと同じ形式でFirebase認証（パスワードはブラウザとFirebaseの間でのみ扱われる）
+        const auth = getFirebaseAuth();
+        const credential = await signInWithEmailAndPassword(auth, `${loginId}@example.com`, password);
+        const idToken = await credential.user.getIdToken();
+        await signOut(auth); // トークンは取得済み。ブラウザにFirebaseのログイン状態は残さない
+        await loginWithEpis(idToken);
+      } else {
+        await login(loginId, password);
+      }
       router.push("/");
     } catch (err) {
       // 規約への同意の有効期限（24時間）が切れた場合は、規約ページへ戻す
-      if ((err as { code?: string }).code === "TERMS_REQUIRED") {
+      const code = (err as { code?: string }).code;
+      if (code === "TERMS_REQUIRED") {
         window.location.href = "/terms";
         return;
       }
       setError(
-        err instanceof Error ? err.message : "ログインに失敗しました"
+        code?.startsWith("auth/")
+          ? firebaseErrorMessage(code)
+          : err instanceof Error
+            ? err.message
+            : "ログインに失敗しました"
       );
     } finally {
       setLoading(false);
     }
   }
+
+  const isEpis = mode === "epis";
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-8">
@@ -42,7 +105,7 @@ export default function LoginPage() {
             上級ライティング添削
           </h1>
           <p className="text-sm text-[#9B9A97] mt-1">
-            アカウントにログインしてください
+            {isEpis ? "ミントサイトのIDとパスワードでログイン" : "管理者ログイン"}
           </p>
         </div>
 
@@ -50,7 +113,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#37352F] mb-1.5">
-                ログインID
+                {isEpis ? "ミントサイトのID" : "ログインID"}
               </label>
               <input
                 type="text"
@@ -58,7 +121,8 @@ export default function LoginPage() {
                 onChange={(e) => setLoginId(e.target.value)}
                 required
                 autoComplete="username"
-                placeholder="ログインIDを入力"
+                autoCapitalize="none"
+                placeholder="IDを入力"
                 className="w-full border border-[#C3C2BF] rounded-lg px-3 py-2.5 text-sm text-[#37352F] placeholder:text-[#9B9A97] focus:border-[#6C5CE7] focus:ring-2 focus:ring-[#6C5CE7]/20 outline-none transition-colors"
               />
             </div>
@@ -101,7 +165,27 @@ export default function LoginPage() {
         </div>
 
         <p className="text-xs text-[#9B9A97] text-center mt-4">
-          アカウントは管理者が作成します
+          {isEpis ? (
+            <>
+              ミントサイトと同じIDとパスワードを使います（生徒・先生）
+              <br />
+              <button
+                type="button"
+                onClick={() => switchMode("admin")}
+                className="mt-2 underline hover:text-[#6B6B6B]"
+              >
+                管理者ログインはこちら
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => switchMode("epis")}
+              className="underline hover:text-[#6B6B6B]"
+            >
+              ミントサイトのIDでログインする
+            </button>
+          )}
         </p>
       </div>
     </div>

@@ -23,6 +23,18 @@ export async function POST(
     );
   }
 
+  const { data: target } = await supabase
+    .from("users")
+    .select("auth_provider")
+    .eq("id", id)
+    .single();
+  if (target && target.auth_provider !== "local") {
+    return NextResponse.json(
+      { error: "ミントサイトのアカウントのパスワードは、ミントサイトで変更してください" },
+      { status: 400 }
+    );
+  }
+
   const passwordHash = await hashPassword(password);
 
   const { error } = await supabase

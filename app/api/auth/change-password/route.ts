@@ -28,12 +28,19 @@ export async function POST(req: NextRequest) {
   // 現在のパスワードを検証
   const { data: user, error: fetchError } = await supabase
     .from("users")
-    .select("password_hash")
+    .select("password_hash, auth_provider")
     .eq("id", session.userId)
     .single();
 
   if (fetchError || !user) {
     return NextResponse.json({ error: "ユーザーが見つかりません" }, { status: 404 });
+  }
+
+  if (user.auth_provider !== "local") {
+    return NextResponse.json(
+      { error: "ミントサイトのIDでログインしている場合、パスワードはミントサイトで変更してください" },
+      { status: 400 }
+    );
   }
 
   const valid = await verifyPassword(currentPassword, user.password_hash);
