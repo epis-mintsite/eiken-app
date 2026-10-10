@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import EssayHistory from "@/components/essay/EssayHistory";
 
 type SortBy = "corrected_at" | "student_name";
 type SortOrder = "asc" | "desc";
@@ -24,6 +25,17 @@ interface CorrectionSummary {
 
 export default function HistoryPage() {
   const router = useRouter();
+  // 「英作文・要約」と「エッセイ・志望理由書・作文」のタブ（?tab=essay で後者を開く）
+  const [tab, setTab] = useState<"writing" | "essay">("writing");
+  useEffect(() => {
+    // URL はブラウザでしか読めないため、表示後に一度だけ反映する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (new URLSearchParams(window.location.search).get("tab") === "essay") setTab("essay");
+  }, []);
+  function switchTab(next: "writing" | "essay") {
+    setTab(next);
+    router.replace(next === "essay" ? "/history?tab=essay" : "/history");
+  }
   const [corrections, setCorrections] = useState<CorrectionSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -109,16 +121,42 @@ export default function HistoryPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">添削履歴</h1>
-            <p className="text-sm text-[#9B9A97] mt-1">{total}件の添削</p>
+            {tab === "writing" && (
+              <p className="text-sm text-[#9B9A97] mt-1">{total}件の添削</p>
+            )}
           </div>
           <Link
-            href="/correct"
+            href={tab === "essay" ? "/essay" : "/correct"}
             className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
           >
             新規添削
           </Link>
         </div>
 
+        <div className="flex border-b border-[#E3E2DE]">
+          {([
+            ["writing", "英作文・要約"],
+            ["essay", "エッセイ・志望理由書・作文"],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => switchTab(key)}
+              className={`relative px-4 py-3 text-sm font-medium transition-colors ${
+                tab === key ? "text-[#37352F]" : "text-[#9B9A97] hover:text-[#37352F]"
+              }`}
+            >
+              {label}
+              {tab === key && (
+                <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#37352F]" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {tab === "essay" ? (
+          <EssayHistory />
+        ) : (
+        <>
         {/* Filters */}
         <div className="bg-white rounded-xl border border-[#E3E2DE] p-5 space-y-3">
           <p className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">絞り込み</p>
@@ -253,6 +291,8 @@ export default function HistoryPage() {
             </>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
   );

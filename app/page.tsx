@@ -181,6 +181,10 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-[#37352F]">要約添削</p>
               <p className="text-xs text-[#6B6B6B] mt-1">英文要約の採点・添削</p>
             </Link>
+            <Link href="/essay" className="col-span-2 bg-[#EEF4FA] border border-[#BFD3E6] rounded-xl p-5 hover:opacity-80 transition-opacity">
+              <p className="text-sm font-semibold text-[#1F4E79]">エッセイ・志望理由書・作文の添削</p>
+              <p className="text-xs text-[#6B6B6B] mt-1">書いた文章を貼り付けて、観点別評価・書き直し例・アドバイスを受け取る</p>
+            </Link>
             <Link href="/batch" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
               <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
               <p className="text-xs text-[#6B6B6B] mt-1">複数答案をまとめて処理</p>
@@ -250,6 +254,10 @@ export default function DashboardPage() {
           <Link href="/correct?tab=summary" className="bg-[#E8F4FD] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">要約添削</p>
             <p className="text-xs text-[#6B6B6B] mt-1">英文要約の採点・添削</p>
+          </Link>
+          <Link href="/essay" className="col-span-2 bg-[#EEF4FA] border border-[#BFD3E6] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <p className="text-sm font-semibold text-[#1F4E79]">エッセイ・志望理由書・作文の添削</p>
+            <p className="text-xs text-[#6B6B6B] mt-1">書いた文章を貼り付けて、観点別評価・書き直し例・アドバイスを受け取る</p>
           </Link>
           <Link href="/history" className="bg-[#E8F5E9] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">添削履歴</p>
