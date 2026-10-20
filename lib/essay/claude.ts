@@ -27,6 +27,8 @@ export async function generateEssayFeedback(params: {
   studentName: string;
   grade: string;
   text: string;
+  /** 手書きの写真から読み取り、本人が確認した本文か */
+  fromPhoto?: boolean;
 }): Promise<{ feedback: EssayFeedback; model: string }> {
   const request = {
     model: essayModel(),

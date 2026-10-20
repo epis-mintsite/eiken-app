@@ -55,10 +55,14 @@ export function buildEssayUserPrompt(params: {
   studentName: string;
   grade: string;
   text: string;
+  fromPhoto?: boolean;
 }): string {
   const student = params.grade ? `${params.studentName}（${params.grade}）` : params.studentName;
+  const source = params.fromPhoto
+    ? "\n本文の出どころ: 手書きの写真から書き起こし、本人が確認したもの（原稿用紙のマス目の使い方や字の形は確認できないので、評価や指摘に含めない）"
+    : "";
   return `設問・テーマ: ${params.theme}
-生徒: ${student}
+生徒: ${student}${source}
 
 添削対象の本文:
 <answer>

@@ -5,6 +5,7 @@ import { friendlyAIErrorMessage } from "@/lib/anthropic";
 import { DOC_TYPE_CONFIG, isDocType, measureLength, lengthLabel } from "@/lib/essay/rubrics";
 import { generateEssayFeedback } from "@/lib/essay/claude";
 import { checkEssayDailyLimit } from "@/lib/essay/limits";
+import { countIllegible, ILLEGIBLE_MARK } from "@/lib/essay/transcript-marks";
 
 export const maxDuration = 300;
 
@@ -36,6 +37,8 @@ export async function POST(request: NextRequest) {
   const theme = typeof body.theme === "string" ? body.theme.trim() : "";
   const text = typeof body.text === "string" ? body.text.trim() : "";
   const grade = typeof body.grade === "string" ? body.grade.trim().slice(0, MAX_GRADE_CHARS) : "";
+  // 写真から読み取り、本人が確認した本文かどうか（記録用）
+  const sourceType: "text" | "image" = body.sourceType === "image" ? "image" : "text";
   // 生徒の氏名はセッションから決める（講師・管理者は代理提出のため入力値を使う）
   const inputName = typeof body.studentName === "string" ? body.studentName.trim() : "";
   const studentName = canViewAll(session)
@@ -47,6 +50,9 @@ export async function POST(request: NextRequest) {
     return fail(400, `設問・テーマは${MAX_THEME_CHARS}字以内にしてください`);
   }
   if (!text) return fail(400, "本文を入力してください");
+  if (countIllegible(text) > 0) {
+    return fail(400, `読み取れなかった文字（${ILLEGIBLE_MARK}）が残っています。写真を見て直してください。`);
+  }
 
   const length = measureLength(text, cfg.lengthUnit);
   if (length > cfg.maxLength) {
@@ -83,6 +89,7 @@ export async function POST(request: NextRequest) {
           studentName,
           grade,
           text,
+          fromPhoto: sourceType === "image",
         });
 
         send("status", { message: "結果を保存しています..." });
@@ -95,7 +102,7 @@ export async function POST(request: NextRequest) {
             grade,
             doc_type: docType,
             theme,
-            source_type: "text",
+            source_type: sourceType,
             original_text: text,
             feedback_json: feedback,
             model,

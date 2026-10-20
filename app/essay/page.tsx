@@ -1,13 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import type { DocType } from "@/types/essay";
 import { DOC_TYPES } from "@/types/essay";
 import { DOC_TYPE_CONFIG, measureLength, lengthLabel } from "@/lib/essay/rubrics";
+import { compressImage } from "@/lib/image-compress";
+import { countIllegible, ILLEGIBLE_MARK, MAX_ESSAY_PHOTOS } from "@/lib/essay/transcript-marks";
 
 const ACCENT = "#1F4E79";
+
+type InputMode = "text" | "photo";
+interface Photo {
+  file: File;
+  url: string;
+}
 
 export default function EssayNewPage() {
   const router = useRouter();
@@ -23,13 +31,84 @@ export default function EssayNewPage() {
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
 
+  // 写真から読み取る
+  const [mode, setMode] = useState<InputMode>("text");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [reading, setReading] = useState(false);
+  const [transcribed, setTranscribed] = useState(false);
+  const [photoNote, setPhotoNote] = useState("");
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLInputElement>(null);
+
+  // 画面を離れるときにプレビュー用のURLを解放する
+  const photosRef = useRef<Photo[]>([]);
+  useEffect(() => {
+    photosRef.current = photos;
+  }, [photos]);
+  useEffect(() => () => photosRef.current.forEach((p) => URL.revokeObjectURL(p.url)), []);
+
   const cfg = docType ? DOC_TYPE_CONFIG[docType] : null;
   const length = useMemo(
     () => (cfg ? measureLength(text, cfg.lengthUnit) : 0),
     [text, cfg]
   );
   const tooLong = !!cfg && length > cfg.maxLength;
-  const canSubmit = !!docType && theme.trim() && text.trim() && !tooLong && !loading;
+  const illegible = countIllegible(text);
+  const showText = mode === "text" || transcribed;
+  const busy = loading || reading;
+  const canSubmit =
+    !!docType && theme.trim() && text.trim() && showText && !tooLong && illegible === 0 && !busy;
+
+  function addPhotos(list: FileList | null) {
+    if (!list) return;
+    const room = MAX_ESSAY_PHOTOS - photos.length;
+    const added = Array.from(list)
+      .slice(0, room)
+      .map((file) => ({ file, url: URL.createObjectURL(file) }));
+    if (list.length > room) setError(`写真は${MAX_ESSAY_PHOTOS}枚までです`);
+    else setError("");
+    setPhotos((prev) => [...prev, ...added]);
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].url);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function handleTranscribe() {
+    if (!docType || photos.length === 0 || reading) return;
+    setReading(true);
+    setError("");
+    setPhotoNote("");
+    try {
+      const form = new FormData();
+      form.append("docType", docType);
+      for (const p of photos) {
+        // 手書きの細かい字を読むため、通常の答案より少し大きめに残す
+        form.append("images", await compressImage(p.file, 2000, 0.85));
+      }
+      const res = await fetch("/api/essay/transcribe", { method: "POST", body: form });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "読み取りに失敗しました");
+      setText(body.text);
+      setPhotoNote(body.note || "");
+      setTranscribed(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "読み取りに失敗しました");
+    } finally {
+      setReading(false);
+    }
+  }
+
+  function retakePhotos() {
+    photos.forEach((p) => URL.revokeObjectURL(p.url));
+    setPhotos([]);
+    setTranscribed(false);
+    setPhotoNote("");
+    setText("");
+  }
 
   async function readStream(res: Response) {
     const reader = res.body?.getReader();
@@ -72,7 +151,14 @@ export default function EssayNewPage() {
       const res = await fetch("/api/essay/correct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ docType, theme, text, grade, studentName }),
+        body: JSON.stringify({
+          docType,
+          theme,
+          text,
+          grade,
+          studentName,
+          sourceType: mode === "photo" && transcribed ? "image" : "text",
+        }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -118,7 +204,7 @@ export default function EssayNewPage() {
                     key={t}
                     type="button"
                     onClick={() => setDocType(t)}
-                    disabled={loading}
+                    disabled={busy}
                     className={`text-left rounded-xl border-2 p-4 transition-colors ${
                       selected ? "bg-[#EEF4FA]" : "border-[#E3E2DE] hover:border-[#BFD3E6]"
                     }`}
@@ -143,7 +229,7 @@ export default function EssayNewPage() {
                   onChange={(e) => setTheme(e.target.value)}
                   rows={2}
                   maxLength={500}
-                  disabled={loading}
+                  disabled={busy}
                   placeholder={
                     docType === "english_essay"
                       ? "例: Do you agree that students should have part-time jobs? (120-150 words)"
@@ -163,7 +249,7 @@ export default function EssayNewPage() {
                       value={studentName}
                       onChange={(e) => setStudentName(e.target.value)}
                       maxLength={50}
-                      disabled={loading}
+                      disabled={busy}
                       placeholder={`生徒名（空欄なら ${user?.name ?? ""}）`}
                       className="flex-1 rounded-lg border border-[#E3E2DE] px-3 py-2 text-sm focus:outline-none focus:border-[#1F4E79]"
                     />
@@ -172,7 +258,7 @@ export default function EssayNewPage() {
                     value={grade}
                     onChange={(e) => setGrade(e.target.value)}
                     maxLength={20}
-                    disabled={loading}
+                    disabled={busy}
                     placeholder="学年（任意。例: 中3）"
                     className="sm:w-48 rounded-lg border border-[#E3E2DE] px-3 py-2 text-sm focus:outline-none focus:border-[#1F4E79]"
                   />
@@ -180,9 +266,151 @@ export default function EssayNewPage() {
               </section>
 
               {/* ③ 本文 */}
-              <section>
-                <div className="flex items-baseline justify-between mb-3">
+              <section className="space-y-3">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
                   <h2 className="text-sm font-semibold text-[#37352F]">③ 本文</h2>
+                  <div className="inline-flex rounded-lg border border-[#E3E2DE] overflow-hidden text-sm" role="group" aria-label="本文の入れ方">
+                    {([
+                      ["text", "文字で入力"],
+                      ["photo", "手書きの写真から"],
+                    ] as const).map(([m, label]) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMode(m)}
+                        disabled={busy}
+                        aria-pressed={mode === m}
+                        className={`px-3 py-1.5 ${mode === m ? "bg-[#EEF4FA] font-semibold" : "bg-white text-[#6B6B6B]"}`}
+                        style={mode === m ? { color: ACCENT } : undefined}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {mode === "photo" && !transcribed && (
+                  <div className="rounded-xl border-2 border-dashed border-[#BFD3E6] p-4 space-y-3">
+                    <p className="text-sm text-[#37352F]">
+                      手書きの{cfg.label}を写真に撮ると、AIが文字に起こします。
+                      読み取った文章を確認してから添削します（写真は保存しません）。
+                    </p>
+                    <ul className="text-xs text-[#6B6B6B] list-disc pl-5 space-y-0.5">
+                      <li>明るい場所で、紙全体がまっすぐ入るように撮る</li>
+                      <li>{MAX_ESSAY_PHOTOS}枚まで（2枚のときは1枚目から順に読みます）</li>
+                      <li>名前や先生の書き込みは読み取りません</li>
+                    </ul>
+
+                    {photos.length > 0 && (
+                      <div className="flex gap-3 flex-wrap">
+                        {photos.map((p, i) => (
+                          <figure key={p.url} className="relative w-28">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- 端末内のプレビュー（object URL） */}
+                            <img src={p.url} alt={`${i + 1}枚目の写真`} className="w-28 h-36 object-cover rounded-lg border border-[#E3E2DE]" />
+                            <figcaption className="text-xs text-[#6B6B6B] mt-1 text-center">{i + 1}枚目</figcaption>
+                            <button
+                              type="button"
+                              onClick={() => removePhoto(i)}
+                              disabled={reading}
+                              aria-label={`${i + 1}枚目の写真を外す`}
+                              className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white border border-[#E3E2DE] text-sm text-[#6B6B6B]"
+                            >
+                              ×
+                            </button>
+                          </figure>
+                        ))}
+                      </div>
+                    )}
+
+                    <input
+                      ref={cameraRef}
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={(e) => {
+                        addPhotos(e.target.files);
+                        e.target.value = "";
+                      }}
+                    />
+                    <input
+                      ref={pickerRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        addPhotos(e.target.files);
+                        e.target.value = "";
+                      }}
+                    />
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => cameraRef.current?.click()}
+                        disabled={reading || photos.length >= MAX_ESSAY_PHOTOS}
+                        className="rounded-lg border border-[#BFD3E6] bg-white px-4 py-2 text-sm font-medium disabled:opacity-40"
+                        style={{ color: ACCENT }}
+                      >
+                        カメラで撮る
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => pickerRef.current?.click()}
+                        disabled={reading || photos.length >= MAX_ESSAY_PHOTOS}
+                        className="rounded-lg border border-[#BFD3E6] bg-white px-4 py-2 text-sm font-medium disabled:opacity-40"
+                        style={{ color: ACCENT }}
+                      >
+                        写真を選ぶ
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleTranscribe}
+                        disabled={reading || photos.length === 0}
+                        className="ml-auto rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                        style={{ backgroundColor: ACCENT }}
+                      >
+                        {reading ? "読み取っています..." : "読み取る"}
+                      </button>
+                    </div>
+                    {reading && (
+                      <p className="text-xs text-[#9B9A97]">30秒ほどかかります。画面を閉じずにお待ちください。</p>
+                    )}
+                  </div>
+                )}
+
+                {mode === "photo" && transcribed && (
+                  <div className="rounded-xl bg-[#EEF4FA] p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <p className="text-sm text-[#37352F]">
+                        写真から読み取った文章です。<b>写真と見比べて、読みまちがいを直してから</b>添削してください。
+                        自分で書いたまちがいは、そのまま残してください（添削で直し方を説明します）。
+                      </p>
+                      <button
+                        type="button"
+                        onClick={retakePhotos}
+                        disabled={busy}
+                        className="text-xs underline text-[#6B6B6B] shrink-0"
+                      >
+                        写真を撮り直す
+                      </button>
+                    </div>
+                    {photoNote && <p className="text-xs text-[#8A5A00]">写真について: {photoNote}</p>}
+                    <div className="flex gap-2 flex-wrap">
+                      {photos.map((p, i) => (
+                        <a key={p.url} href={p.url} target="_blank" rel="noreferrer" className="block">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- 端末内のプレビュー（object URL） */}
+                          <img src={p.url} alt={`${i + 1}枚目の写真（タップで拡大）`} className="w-20 h-24 object-cover rounded-md border border-[#BFD3E6]" />
+                        </a>
+                      ))}
+                      <span className="text-xs text-[#6B6B6B] self-end">写真をタップすると大きく見られます</span>
+                    </div>
+                  </div>
+                )}
+
+                {showText && (
+                <>
+                <div className="flex justify-end">
                   <span className={`text-xs ${tooLong ? "text-[#C62828] font-semibold" : "text-[#9B9A97]"}`}>
                     {length} / {cfg.maxLength}
                     {lengthLabel(cfg.lengthUnit)}
@@ -192,7 +420,7 @@ export default function EssayNewPage() {
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   rows={14}
-                  disabled={loading}
+                  disabled={busy}
                   placeholder={
                     docType === "english_essay"
                       ? "Write or paste your essay here."
@@ -207,6 +435,13 @@ export default function EssayNewPage() {
                     {cfg.label}は{cfg.maxLength}
                     {lengthLabel(cfg.lengthUnit)}までです。
                   </p>
+                )}
+                {illegible > 0 && (
+                  <p className="text-xs text-[#C62828] font-semibold">
+                    読み取れなかった文字（{ILLEGIBLE_MARK}）があと{illegible}か所あります。写真を見て、正しい文字に直してください。
+                  </p>
+                )}
+                </>
                 )}
               </section>
 
