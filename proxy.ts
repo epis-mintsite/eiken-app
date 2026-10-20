@@ -17,7 +17,8 @@ import { verifyTermsCookie } from "@/lib/terms-cookie";
 // （/api/auth/logout は、再同意が必要な状態でもログアウトできるように通す）
 const alwaysPublic = ["/terms", "/api/terms", "/api/health", "/api/auth/logout"];
 // 規約に同意済み（Cookie）なら未ログインでも開けるパス
-const loginPaths = ["/login", "/api/auth/login", "/api/auth/epis-login"];
+// （/api/auth/demo-login は手元専用。Vercel 上ではルート自体が 404 を返す）
+const loginPaths = ["/login", "/api/auth/login", "/api/auth/epis-login", "/api/auth/demo-login"];
 
 const encodedKey = new TextEncoder().encode(process.env.JWT_SECRET);
 

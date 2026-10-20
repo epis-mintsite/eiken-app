@@ -95,6 +95,21 @@ export default function LoginPage() {
     }
   }
 
+  // 手元専用: デモ生徒でログイン（NEXT_PUBLIC_DEMO_STUDENT_LOGIN=1 でビルドしたときだけ表示）
+  async function handleDemoLogin() {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/demo-login", { method: "POST" });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "デモ生徒でログインできませんでした（DEMO_STUDENT_LOGIN=1 で起動していますか？）");
+      window.location.href = "/";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "デモ生徒でログインできませんでした");
+      setLoading(false);
+    }
+  }
+
   const isEpis = mode === "epis";
 
   return (
@@ -187,6 +202,20 @@ export default function LoginPage() {
             </button>
           )}
         </p>
+
+        {process.env.NEXT_PUBLIC_DEMO_STUDENT_LOGIN === "1" && (
+          <div className="mt-6 rounded-lg border border-dashed border-[#E0A800] bg-[#FFF8E1] p-3 text-center">
+            <p className="text-xs text-[#7A5B00] mb-2">動作確認用（本番には表示されません）</p>
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="text-sm font-medium text-[#7A5B00] underline disabled:opacity-50"
+            >
+              デモ生徒でログイン
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
