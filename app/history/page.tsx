@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import EssayHistory from "@/components/essay/EssayHistory";
+import GrandprixHistory from "@/components/grandprix/GrandprixHistory";
 
 type SortBy = "corrected_at" | "student_name";
 type SortOrder = "asc" | "desc";
@@ -25,16 +26,17 @@ interface CorrectionSummary {
 
 export default function HistoryPage() {
   const router = useRouter();
-  // 「英作文・要約」と「エッセイ・志望理由書・作文」のタブ（?tab=essay で後者を開く）
-  const [tab, setTab] = useState<"writing" | "essay">("writing");
+  // 「英作文・要約」「エッセイ・志望理由書・作文」「グランプリ」のタブ（?tab=essay / ?tab=grandprix で開く）
+  const [tab, setTab] = useState<"writing" | "essay" | "grandprix">("writing");
   useEffect(() => {
     // URL はブラウザでしか読めないため、表示後に一度だけ反映する
+    const initial = new URLSearchParams(window.location.search).get("tab");
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (new URLSearchParams(window.location.search).get("tab") === "essay") setTab("essay");
+    if (initial === "essay" || initial === "grandprix") setTab(initial);
   }, []);
-  function switchTab(next: "writing" | "essay") {
+  function switchTab(next: "writing" | "essay" | "grandprix") {
     setTab(next);
-    router.replace(next === "essay" ? "/history?tab=essay" : "/history");
+    router.replace(next === "writing" ? "/history" : `/history?tab=${next}`);
   }
   const [corrections, setCorrections] = useState<CorrectionSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -126,7 +128,7 @@ export default function HistoryPage() {
             )}
           </div>
           <Link
-            href={tab === "essay" ? "/essay" : "/correct"}
+            href={tab === "essay" ? "/essay" : tab === "grandprix" ? "/grandprix" : "/correct"}
             className="bg-[#6C5CE7] text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
           >
             新規添削
@@ -137,6 +139,7 @@ export default function HistoryPage() {
           {([
             ["writing", "英作文・要約"],
             ["essay", "エッセイ・志望理由書・作文"],
+            ["grandprix", "グランプリ"],
           ] as const).map(([key, label]) => (
             <button
               key={key}
@@ -155,6 +158,8 @@ export default function HistoryPage() {
 
         {tab === "essay" ? (
           <EssayHistory />
+        ) : tab === "grandprix" ? (
+          <GrandprixHistory />
         ) : (
         <>
         {/* Filters */}

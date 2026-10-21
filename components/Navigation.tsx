@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { isGPPeriod } from "@/lib/grandprix/rubric";
 
 const NAV_ITEMS_COMMON = [
   { href: "/", label: "ダッシュボード" },
@@ -41,11 +42,16 @@ export default function Navigation() {
     return href === "/" ? pathname === "/" : pathname.startsWith(href);
   }
 
-  const navItems = user?.role === "admin"
+  const baseItems = user?.role === "admin"
     ? NAV_ITEMS_ADMIN
     : user?.role === "teacher"
     ? NAV_ITEMS_TEACHER
     : NAV_ITEMS_COMMON;
+  // グランプリ: 生徒は期間中だけ、講師・管理者は公開前の試用のため常に表示
+  const showGrandprix = !!user && (user.role === "admin" || user.role === "teacher" || isGPPeriod());
+  const navItems = showGrandprix
+    ? [baseItems[0], { href: "/grandprix", label: "グランプリ" }, ...baseItems.slice(1)]
+    : baseItems;
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-[#E3E2DE]">
