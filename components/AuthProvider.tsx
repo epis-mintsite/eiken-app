@@ -14,6 +14,8 @@ interface AuthUser {
   loginId: string;
   name: string;
   role: string;
+  /** グランプリの入口を出すか（/api/auth/me が返す。講師・管理者は常に true） */
+  grandprixOpen?: boolean;
 }
 
 interface AuthContextType {
@@ -79,6 +81,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await res.json();
     setUser(data.user);
+    // グランプリの入口など、ログイン応答に含まれない項目を取り直す
+    refreshUser();
   }
 
   async function loginWithEpis(idToken: string) {
@@ -95,6 +99,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       throw err;
     }
     setUser(data.user);
+    refreshUser();
   }
 
   async function logout() {

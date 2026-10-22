@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { isGPPeriod } from "@/lib/grandprix/rubric";
 
 interface RecentCorrection {
   id: string;
@@ -107,6 +106,10 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-[#37352F]">設定</p>
               <p className="text-xs text-[#6B6B6B] mt-1">システム設定</p>
             </Link>
+            <Link href="/grandprix" className="col-span-3 bg-[#FFF6E5] border border-[#F2D9A6] rounded-xl p-5 hover:opacity-80 transition-opacity">
+              <p className="text-sm font-semibold text-[#8A5A00]">100本ノックグランプリ 下書きチェック</p>
+              <p className="text-xs text-[#6B6B6B] mt-1">管理者・講師は応募期間の前でも試せます</p>
+            </Link>
           </div>
 
           {/* Recent corrections */}
@@ -188,7 +191,7 @@ export default function DashboardPage() {
             </Link>
             <Link href="/grandprix" className="col-span-2 bg-[#FFF6E5] border border-[#F2D9A6] rounded-xl p-5 hover:opacity-80 transition-opacity">
               <p className="text-sm font-semibold text-[#8A5A00]">100本ノックグランプリ 下書きチェック</p>
-              <p className="text-xs text-[#6B6B6B] mt-1">講師・管理者は公開前（11/1より前）でも試せます</p>
+              <p className="text-xs text-[#6B6B6B] mt-1">管理者・講師は応募期間の前でも試せます</p>
             </Link>
             <Link href="/batch" className="bg-[#FFF3E8] rounded-xl p-5 hover:opacity-80 transition-opacity">
               <p className="text-sm font-semibold text-[#37352F]">一括処理</p>
@@ -264,10 +267,10 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#1F4E79]">エッセイ・志望理由書・作文の添削</p>
             <p className="text-xs text-[#6B6B6B] mt-1">書いた文章を貼り付けて、観点別評価・書き直し例・アドバイスを受け取る</p>
           </Link>
-          {isGPPeriod() && (
+          {user?.grandprixOpen && (
             <Link href="/grandprix" className="col-span-2 bg-[#FFF6E5] border border-[#F2D9A6] rounded-xl p-5 hover:opacity-80 transition-opacity">
               <p className="text-sm font-semibold text-[#8A5A00]">100本ノックグランプリ 下書きチェック</p>
-              <p className="text-xs text-[#6B6B6B] mt-1">提出する前に、下書きの形式と審査の観点をチェック（11/14まで）</p>
+              <p className="text-xs text-[#6B6B6B] mt-1">提出する前に、下書きの形式と審査の観点をチェック（応募期間中）</p>
             </Link>
           )}
           <Link href="/history" className="bg-[#E8F5E9] rounded-xl p-5 hover:opacity-80 transition-opacity">

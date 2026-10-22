@@ -12,7 +12,7 @@ export const GP_THEME = "100本ノックのテーマと私と今いる国";
 /**
  * 生徒が使える期間（Asia/Shanghai 基準。終わりは含まない）。
  * サーバーは GP_OPEN_FROM / GP_CLOSE_AT があればそちらを使う（lib/grandprix/limits.ts）。
- * ナビゲーションの表示はこの既定値で判断する。
+ * ホームのカードとメニューの表示も、/api/auth/me を通じて同じ判定に従う。
  */
 export const GP_DEFAULT_OPEN_FROM = "2026-11-01T00:00:00+08:00";
 export const GP_DEFAULT_CLOSE_AT = "2026-11-15T00:00:00+08:00";
@@ -23,10 +23,6 @@ export const GP_DEFAULT_DAILY_LIMIT = 5;
 /** 結果画面の「直してもう一度チェック」から入力画面へ下書きを渡す sessionStorage のキー */
 export const GP_RESTORE_KEY = "gpRestore";
 
-/** 期間中か（ナビゲーションの表示用。サーバーの判定は lib/grandprix/limits.ts） */
-export function isGPPeriod(now = new Date()): boolean {
-  return now >= new Date(GP_DEFAULT_OPEN_FROM) && now < new Date(GP_DEFAULT_CLOSE_AT);
-}
 
 export interface DivisionRule {
   label: string;
