@@ -8,6 +8,7 @@ import { DIVISION_RULES } from "@/lib/grandprix/rubric";
 import { bodyLength, isTooShort, unitLabel } from "@/lib/grandprix/format";
 import { generateGPDraftCheck } from "@/lib/grandprix/claude";
 import { checkGPAvailability } from "@/lib/grandprix/limits";
+import { countIllegible, ILLEGIBLE_MARK } from "@/lib/essay/transcript-marks";
 
 export const maxDuration = 300;
 
@@ -46,12 +47,17 @@ export async function POST(request: NextRequest) {
   const grade = str(input.grade, MAX.grade);
   const summary = str(input.summary);
   const body = str(input.body);
+  // 写真から読み取り、本人が確認した本文かどうか（プロンプトに伝えるだけで保存はしない）
+  const fromPhoto = input.sourceType === "image";
 
   if (!knock) return fail(400, "選んだ100本ノックを入力してください");
   if (!title) return fail(400, "タイトルを入力してください");
   if (!summary) return fail(400, "要旨を入力してください");
   if (summary.length > MAX.summary) return fail(400, "要旨が長すぎます");
   if (!body) return fail(400, "本文を入力してください");
+  if (countIllegible(body) > 0) {
+    return fail(400, `読み取れなかった文字（${ILLEGIBLE_MARK}）が残っています。写真を見て直してください。`);
+  }
   if (isTooShort(division, body)) {
     return fail(400, "本文がまだ短いので、AIのチェックの前に書き進めましょう。");
   }
@@ -90,6 +96,7 @@ export async function POST(request: NextRequest) {
           title,
           summary,
           body,
+          fromPhoto,
         });
 
         send("status", { message: "結果を保存しています..." });

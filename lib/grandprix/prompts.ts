@@ -71,10 +71,14 @@ export function buildGPUserPrompt(params: {
   title: string;
   summary: string;
   body: string;
+  fromPhoto?: boolean;
 }): string {
+  const source = params.fromPhoto
+    ? "\n本文の出どころ: 手書きの写真から書き起こし、本人が確認したもの（原稿用紙のマス目の使い方や字の形は確認できないので、評価や指摘に含めない）"
+    : "";
   return `生徒が選んだ100本ノック: ${params.knock}
 生徒が今いる国・都市: ${params.country || "（書かれていない）"}
-学年: ${params.grade || "（書かれていない）"}
+学年: ${params.grade || "（書かれていない）"}${source}
 
 <title>
 ${params.title}

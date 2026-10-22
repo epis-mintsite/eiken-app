@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -8,9 +8,17 @@ import type { Division, FeedbackLang, GPDraft, GPStatus } from "@/types/grandpri
 import { DIVISIONS } from "@/types/grandprix";
 import { DIVISION_RULES, GP_RESTORE_KEY, GP_THEME, GP_TITLE, SUMMARY_MAX_WORDS, THEME_ELEMENTS } from "@/lib/grandprix/rubric";
 import { bodyLength, checkFormat, COUNTING_NOTE, countWords, isTooShort, unitLabel } from "@/lib/grandprix/format";
+import { compressImage } from "@/lib/image-compress";
+import { countIllegible, ILLEGIBLE_MARK, MAX_ESSAY_PHOTOS } from "@/lib/essay/transcript-marks";
 
 const ACCENT = "#1F4E79";
 const DRAFT_KEY = "gp-draft-v1";
+
+type InputMode = "text" | "photo";
+interface Photo {
+  file: File;
+  url: string;
+}
 
 const EMPTY: GPDraft = {
   division: "JC",
@@ -48,6 +56,22 @@ export default function GrandprixPage() {
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
   const [showGuide, setShowGuide] = useState(false);
+
+  // 本文を手書きの写真から読み取る
+  const [mode, setMode] = useState<InputMode>("text");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [reading, setReading] = useState(false);
+  const [transcribed, setTranscribed] = useState(false);
+  const [photoNote, setPhotoNote] = useState("");
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLInputElement>(null);
+
+  // 画面を離れるときにプレビュー用のURLを解放する
+  const photosRef = useRef<Photo[]>([]);
+  useEffect(() => {
+    photosRef.current = photos;
+  }, [photos]);
+  useEffect(() => () => photosRef.current.forEach((p) => URL.revokeObjectURL(p.url)), []);
 
   // 下書きの復元（結果画面から戻ったとき → この端末に残っている下書き の順）
   useEffect(() => {
@@ -89,14 +113,67 @@ export default function GrandprixPage() {
   const summaryWords = useMemo(() => countWords(draft.summary), [draft.summary]);
   const format = useMemo(() => checkFormat(draft), [draft]);
   const tooLong = length > rule.bodyHardMax;
+  const illegible = countIllegible(draft.body);
+  const showBody = mode === "text" || transcribed;
+  const busy = loading || reading;
   const closed = status !== null && !status.open;
   const usedUp = status?.limit != null && status.used >= status.limit;
   const required = !!(draft.knock.trim() && draft.title.trim() && draft.summary.trim() && draft.body.trim());
-  const canSubmit = required && !tooLong && !loading && !closed && !usedUp;
+  const canSubmit = required && showBody && !tooLong && illegible === 0 && !busy && !closed && !usedUp;
 
   function set<K extends keyof GPDraft>(key: K, value: GPDraft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
     if (key === "body" || key === "division") setShowGuide(false);
+  }
+
+  function addPhotos(list: FileList | null) {
+    if (!list) return;
+    const room = MAX_ESSAY_PHOTOS - photos.length;
+    const added = Array.from(list)
+      .slice(0, room)
+      .map((file) => ({ file, url: URL.createObjectURL(file) }));
+    if (list.length > room) setError(`写真は${MAX_ESSAY_PHOTOS}枚までです`);
+    else setError("");
+    setPhotos((prev) => [...prev, ...added]);
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].url);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function handleTranscribe() {
+    if (photos.length === 0 || reading) return;
+    setReading(true);
+    setError("");
+    setPhotoNote("");
+    try {
+      const form = new FormData();
+      form.append("division", draft.division);
+      for (const p of photos) {
+        // 手書きの細かい字を読むため、通常の答案より少し大きめに残す
+        form.append("images", await compressImage(p.file, 2000, 0.85));
+      }
+      const res = await fetch("/api/grandprix/transcribe", { method: "POST", body: form });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "読み取りに失敗しました");
+      set("body", body.text);
+      setPhotoNote(body.note || "");
+      setTranscribed(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "読み取りに失敗しました");
+    } finally {
+      setReading(false);
+    }
+  }
+
+  function retakePhotos() {
+    photos.forEach((p) => URL.revokeObjectURL(p.url));
+    setPhotos([]);
+    setTranscribed(false);
+    setPhotoNote("");
   }
 
   async function readStream(res: Response) {
@@ -143,7 +220,7 @@ export default function GrandprixPage() {
       const res = await fetch("/api/grandprix/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
+        body: JSON.stringify({ ...draft, sourceType: mode === "photo" && transcribed ? "image" : "text" }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -208,7 +285,7 @@ export default function GrandprixPage() {
                     key={d}
                     type="button"
                     onClick={() => set("division", d)}
-                    disabled={loading}
+                    disabled={busy}
                     aria-pressed={selected}
                     className={`text-left rounded-xl border-2 p-4 transition-colors ${
                       selected ? "bg-[#EEF4FA]" : "border-[#E3E2DE] hover:border-[#BFD3E6]"
@@ -235,7 +312,7 @@ export default function GrandprixPage() {
               value={draft.knock}
               onChange={(e) => set("knock", e.target.value)}
               maxLength={200}
-              disabled={loading}
+              disabled={busy}
               placeholder="選んだ100本ノック（番号とタイトル。例: 041. Marine Plastic Pollution）"
               aria-label="選んだ100本ノック"
               className={inputCls}
@@ -245,7 +322,7 @@ export default function GrandprixPage() {
                 value={draft.country}
                 onChange={(e) => set("country", e.target.value)}
                 maxLength={100}
-                disabled={loading}
+                disabled={busy}
                 placeholder="今いる国・都市（例: 中国・深圳）"
                 aria-label="今いる国・都市"
                 className={`${inputCls} flex-1`}
@@ -254,7 +331,7 @@ export default function GrandprixPage() {
                 value={draft.grade}
                 onChange={(e) => set("grade", e.target.value)}
                 maxLength={20}
-                disabled={loading}
+                disabled={busy}
                 placeholder="学年（任意。例: 中2）"
                 aria-label="学年"
                 className={`${inputCls} sm:w-44`}
@@ -276,7 +353,7 @@ export default function GrandprixPage() {
                 value={draft.title}
                 onChange={(e) => set("title", e.target.value)}
                 maxLength={200}
-                disabled={loading}
+                disabled={busy}
                 className={`${inputCls} ${draft.division === "GC" ? "font-serif" : ""}`}
               />
             </div>
@@ -296,11 +373,155 @@ export default function GrandprixPage() {
                 onChange={(e) => set("summary", e.target.value)}
                 rows={3}
                 maxLength={1500}
-                disabled={loading}
+                disabled={busy}
                 className={`${inputCls} font-serif leading-relaxed`}
               />
             </div>
 
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <span className="text-xs font-semibold text-[#37352F]">本文の入れ方</span>
+                <div className="inline-flex rounded-lg border border-[#E3E2DE] overflow-hidden text-sm" role="group" aria-label="本文の入れ方">
+                  {([
+                    ["text", "文字で入力"],
+                    ["photo", "手書きの写真から"],
+                  ] as const).map(([m, label]) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMode(m)}
+                      disabled={busy}
+                      aria-pressed={mode === m}
+                      className={`px-3 py-1.5 ${mode === m ? "bg-[#EEF4FA] font-semibold" : "bg-white text-[#6B6B6B]"}`}
+                      style={mode === m ? { color: ACCENT } : undefined}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {mode === "photo" && !transcribed && (
+                <div className="rounded-xl border-2 border-dashed border-[#BFD3E6] p-4 space-y-3">
+                  <p className="text-sm text-[#37352F]">
+                    手書きの本文を写真に撮ると、AIが文字に起こします。読み取った文章を確認してからチェックします（写真は保存しません）。
+                  </p>
+                  <ul className="text-xs text-[#6B6B6B] list-disc pl-5 space-y-0.5">
+                    <li>本文のところを、明るい場所で紙全体がまっすぐ入るように撮る</li>
+                    <li>{MAX_ESSAY_PHOTOS}枚まで（2枚のときは1枚目から順に読みます）</li>
+                    <li>タイトルと要旨は上の欄に入力してください（写真からは本文だけを読みます）</li>
+                  </ul>
+
+                  {photos.length > 0 && (
+                    <div className="flex gap-3 flex-wrap">
+                      {photos.map((p, i) => (
+                        <figure key={p.url} className="relative w-28">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- 端末内のプレビュー（object URL） */}
+                          <img src={p.url} alt={`${i + 1}枚目の写真`} className="w-28 h-36 object-cover rounded-lg border border-[#E3E2DE]" />
+                          <figcaption className="text-xs text-[#6B6B6B] mt-1 text-center">{i + 1}枚目</figcaption>
+                          <button
+                            type="button"
+                            onClick={() => removePhoto(i)}
+                            disabled={reading}
+                            aria-label={`${i + 1}枚目の写真を外す`}
+                            className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white border border-[#E3E2DE] text-sm text-[#6B6B6B]"
+                          >
+                            ×
+                          </button>
+                        </figure>
+                      ))}
+                    </div>
+                  )}
+
+                  <input
+                    ref={cameraRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={(e) => {
+                      addPhotos(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                  <input
+                    ref={pickerRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      addPhotos(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => cameraRef.current?.click()}
+                      disabled={busy || photos.length >= MAX_ESSAY_PHOTOS || closed || usedUp}
+                      className="rounded-lg border border-[#BFD3E6] bg-white px-4 py-2 text-sm font-medium disabled:opacity-40"
+                      style={{ color: ACCENT }}
+                    >
+                      カメラで撮る
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => pickerRef.current?.click()}
+                      disabled={busy || photos.length >= MAX_ESSAY_PHOTOS || closed || usedUp}
+                      className="rounded-lg border border-[#BFD3E6] bg-white px-4 py-2 text-sm font-medium disabled:opacity-40"
+                      style={{ color: ACCENT }}
+                    >
+                      写真を選ぶ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleTranscribe}
+                      disabled={busy || photos.length === 0 || closed || usedUp}
+                      className="ml-auto rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                      style={{ backgroundColor: ACCENT }}
+                    >
+                      {reading ? "読み取っています..." : "読み取る"}
+                    </button>
+                  </div>
+                  {reading && (
+                    <p className="text-xs text-[#9B9A97]">30秒ほどかかります。画面を閉じずにお待ちください。</p>
+                  )}
+                  <p className="text-xs text-[#9B9A97]">読み取りは回数に数えません。</p>
+                </div>
+              )}
+
+              {mode === "photo" && transcribed && (
+                <div className="rounded-xl bg-[#EEF4FA] p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <p className="text-sm text-[#37352F]">
+                      写真から読み取った本文です。<b>写真と見比べて、読みまちがいを直してから</b>チェックしてください。
+                      自分で書いたまちがいは、そのまま残してください（チェックで直し方を教えてくれます）。
+                    </p>
+                    <button
+                      type="button"
+                      onClick={retakePhotos}
+                      disabled={busy}
+                      className="text-xs underline text-[#6B6B6B] shrink-0"
+                    >
+                      写真を撮り直す
+                    </button>
+                  </div>
+                  {photoNote && <p className="text-xs text-[#8A5A00]">写真について: {photoNote}</p>}
+                  <div className="flex gap-2 flex-wrap">
+                    {photos.map((p, i) => (
+                      <a key={p.url} href={p.url} target="_blank" rel="noreferrer" className="block">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- 端末内のプレビュー（object URL） */}
+                        <img src={p.url} alt={`${i + 1}枚目の写真（タップで拡大）`} className="w-20 h-24 object-cover rounded-md border border-[#BFD3E6]" />
+                      </a>
+                    ))}
+                    <span className="text-xs text-[#6B6B6B] self-end">写真をタップすると大きく見られます</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {showBody && (
             <div className="space-y-1">
               <div className="flex justify-between items-baseline gap-2">
                 <label htmlFor="gp-body" className="text-xs font-semibold text-[#37352F]">
@@ -323,7 +544,7 @@ export default function GrandprixPage() {
                 value={draft.body}
                 onChange={(e) => set("body", e.target.value)}
                 rows={16}
-                disabled={loading}
+                disabled={busy}
                 lang={draft.division === "GC" ? "en" : "ja"}
                 className={`${inputCls} leading-relaxed ${draft.division === "GC" ? "font-serif" : ""}`}
               />
@@ -333,8 +554,14 @@ export default function GrandprixPage() {
                   {unit}まで）。
                 </p>
               )}
+              {illegible > 0 && (
+                <p className="text-xs text-[#C62828] font-semibold">
+                  読み取れなかった文字（{ILLEGIBLE_MARK}）があと{illegible}か所あります。写真を見て、正しい文字に直してください。
+                </p>
+              )}
               <p className="text-xs text-[#9B9A97]">数え方: {COUNTING_NOTE}</p>
             </div>
+            )}
           </section>
 
           {/* 形式チェック（その場で） */}
@@ -373,7 +600,7 @@ export default function GrandprixPage() {
                   key={l}
                   type="button"
                   onClick={() => set("feedbackLang", l)}
-                  disabled={loading}
+                  disabled={busy}
                   aria-pressed={draft.feedbackLang === l}
                   className={`px-3 py-1.5 ${draft.feedbackLang === l ? "bg-[#EEF4FA] font-semibold" : "bg-white text-[#6B6B6B]"}`}
                   style={draft.feedbackLang === l ? { color: ACCENT } : undefined}

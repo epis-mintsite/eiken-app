@@ -23,6 +23,8 @@ export async function generateGPDraftCheck(params: {
   title: string;
   summary: string;
   body: string;
+  /** 本文を手書きの写真から読み取り、本人が確認したか */
+  fromPhoto?: boolean;
 }): Promise<{ feedback: GPDraftCheck; model: string }> {
   const request = {
     model: essayModel(),
