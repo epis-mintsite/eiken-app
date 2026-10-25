@@ -125,9 +125,9 @@ const sections = [
 
 export default function GuidePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* Hero */}
-      <div className="border-b border-[#E3E2DE] py-12">
+      <div className="bg-white border-b border-[#E3E2DE] py-12">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#37352F]">
             操作ガイド
@@ -230,7 +230,7 @@ export default function GuidePage() {
               {s.faqs && (
                 <div className="space-y-4">
                   {s.faqs.map((faq, i) => (
-                    <div key={i} className="bg-white rounded-xl border border-[#E3E2DE] p-5">
+                    <div key={i} className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-5">
                       <p className="text-sm font-semibold text-[#37352F]">Q. {faq.q}</p>
                       <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed">A. {faq.a}</p>
                     </div>

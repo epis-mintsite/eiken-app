@@ -22,7 +22,7 @@ const TYPE_BADGE: Record<string, string> = {
 export default function ErrorTable({ errors, showExplanation = false }: Props) {
   if (errors.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+      <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
         <h2 className="text-lg font-semibold text-[#37352F] mb-2">エラーリスト</h2>
         <p className="text-sm text-[#4CAF50]">エラーは見つかりませんでした。</p>
       </div>
@@ -30,7 +30,7 @@ export default function ErrorTable({ errors, showExplanation = false }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">
         エラーリスト（{errors.length}件）
       </h2>

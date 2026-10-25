@@ -52,7 +52,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-8 py-12 space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">設定</h1>
@@ -60,7 +60,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Strictness */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <h2 className="text-lg font-semibold text-[#37352F] mb-4">採点の厳しさ</h2>
           <div className="space-y-3">
             {STRICTNESS_OPTIONS.map((opt) => (
@@ -90,7 +90,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Custom instructions */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <h2 className="text-lg font-semibold text-[#37352F] mb-2">カスタム指示</h2>
           <p className="text-sm text-[#6B6B6B] mb-4">
             添削時にAIに追加で伝えたい指示があれば入力してください（任意）
@@ -107,7 +107,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Prompt preview */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <h2 className="text-lg font-semibold text-[#37352F] mb-2">プロンプトプレビュー</h2>
           <p className="text-sm text-[#6B6B6B] mb-3">
             現在の設定で生成されるシステムプロンプトの追加部分

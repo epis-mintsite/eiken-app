@@ -308,7 +308,7 @@ function CorrectPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-2xl mx-auto px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight text-[#37352F]">
@@ -355,7 +355,7 @@ function CorrectPageInner() {
               {/* Writing form */}
               <UploadDropzone file={file} onFileSelect={setFile} />
 
-              <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
+              <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-8 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                     TOPIC <span className="text-[#EB5757]">*</span>
@@ -409,7 +409,7 @@ function CorrectPageInner() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
+              <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-8 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                     日付
@@ -461,7 +461,7 @@ export default function CorrectPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin h-8 w-8 border-4 border-[#6C5CE7] border-t-transparent rounded-full" />
         </div>
       }

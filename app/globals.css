@@ -39,6 +39,7 @@
   --card-tint-gray: #F7F6F3;
 
   /* ── Surface ── */
+  --page-bg: #F3F3F0;
   --surface-canvas: #FFFFFF;
   --surface: #F7F6F3;
   --surface-soft: #FBFBFA;
@@ -148,7 +149,17 @@
 }
 
 body {
-  background: var(--surface-canvas);
+  /* ページの地は薄いグレー。カード・入力欄・ナビは白にして、面の区別をはっきりさせる */
+  background: var(--page-bg);
   color: var(--text-ink);
   font-family: var(--font-sans);
+}
+
+/* 地をグレーにしたので、入力欄は色の指定がなければ白にする（クラスで色を付けた欄はそちらが優先） */
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,
+  select {
+    background-color: #ffffff;
+  }
 }

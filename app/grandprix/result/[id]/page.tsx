@@ -72,7 +72,7 @@ export default function GrandprixResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-10">
+    <div className="min-h-screen py-10">
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
         <div className="flex flex-wrap justify-between items-center gap-3 mb-6 print:hidden">
           <Link href="/history?tab=grandprix" className="text-sm text-[#2383E2] hover:underline">
@@ -100,7 +100,9 @@ export default function GrandprixResultPage() {
             結果の保存に失敗したため、この画面を閉じると見られなくなります。必要なら印刷して残してください。
           </p>
         )}
-        <GrandprixReport record={record} />
+        <div className="bg-white rounded-2xl border border-[#E3E2DE] shadow-sm p-5 sm:p-8 print:border-0 print:shadow-none print:p-0">
+          <GrandprixReport record={record} />
+        </div>
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ export default function DiffHighlight({ originalText, errors }: Props) {
   const segments = buildSegments(originalText, errors);
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-3">原文（エラー箇所ハイライト）</h2>
       <div className="bg-[#FBFBFA] rounded-lg p-5 text-sm leading-relaxed whitespace-pre-wrap">
         {segments.map((seg, i) =>

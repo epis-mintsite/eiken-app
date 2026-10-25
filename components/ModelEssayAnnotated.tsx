@@ -37,7 +37,7 @@ export default function ModelEssayAnnotated({ essay, annotations }: Props) {
     .filter((w) => w.length > 0).length;
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-[#37352F]">模範解答</h2>
         <div className="flex items-center gap-3">

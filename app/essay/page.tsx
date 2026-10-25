@@ -180,7 +180,7 @@ export default function EssayNewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight text-[#37352F]">

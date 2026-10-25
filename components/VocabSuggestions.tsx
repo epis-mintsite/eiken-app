@@ -14,7 +14,7 @@ export default function VocabSuggestions({ suggestions }: Props) {
   if (!suggestions || suggestions.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">
         語彙の言い換え提案
       </h2>

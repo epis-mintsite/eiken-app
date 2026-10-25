@@ -118,7 +118,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-8 py-12 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -163,7 +163,7 @@ export default function HistoryPage() {
         ) : (
         <>
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-5 space-y-3">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-5 space-y-3">
           <p className="text-xs font-medium text-[#9B9A97] uppercase tracking-wide">絞り込み</p>
           <div className="flex flex-wrap gap-3">
             <input
@@ -198,7 +198,7 @@ export default function HistoryPage() {
         </div>
 
         {/* Results */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-[#9B9A97]">
               <div className="animate-spin h-6 w-6 border-2 border-[#6C5CE7] border-t-transparent rounded-full mx-auto mb-2" />

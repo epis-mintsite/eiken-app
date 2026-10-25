@@ -57,8 +57,8 @@ export default function DashboardPage() {
   // ===== Admin Dashboard =====
   if (role === "admin") {
     return (
-      <div className="min-h-screen bg-[#FFFFFF]">
-        <div className="border-b border-[#E3E2DE] py-10">
+      <div className="min-h-screen">
+        <div className="bg-white border-b border-[#E3E2DE] py-10">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
               AIライティング添削
@@ -72,19 +72,19 @@ export default function DashboardPage() {
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#6C5CE7]">
                 {loading ? "—" : stats?.totalCorrections ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">総添削数</p>
             </div>
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#0D9488]">
                 {loading ? "—" : stats?.totalStudents ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">生徒数</p>
             </div>
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#E67E22]">
                 {loading ? "—" : stats?.avgScore ?? 0}
               </p>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-[#37352F]">ユーザー管理</p>
               <p className="text-xs text-[#6B6B6B] mt-1">アカウントの追加・編集</p>
             </Link>
-            <Link href="/settings" className="bg-[#F7F6F3] rounded-xl p-5 hover:opacity-80 transition-opacity">
+            <Link href="/settings" className="bg-white border border-[#E3E2DE] rounded-xl p-5 hover:opacity-80 transition-opacity">
               <p className="text-sm font-semibold text-[#37352F]">設定</p>
               <p className="text-xs text-[#6B6B6B] mt-1">システム設定</p>
             </Link>
@@ -126,8 +126,8 @@ export default function DashboardPage() {
   // ===== Teacher Dashboard =====
   if (role === "teacher") {
     return (
-      <div className="min-h-screen bg-[#FFFFFF]">
-        <div className="border-b border-[#E3E2DE] py-10">
+      <div className="min-h-screen">
+        <div className="bg-white border-b border-[#E3E2DE] py-10">
           <div className="max-w-3xl mx-auto px-4">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
               AIライティング添削
@@ -155,19 +155,19 @@ export default function DashboardPage() {
         <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#6C5CE7]">
                 {loading ? "—" : stats?.totalCorrections ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">添削件数</p>
             </div>
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#0D9488]">
                 {loading ? "—" : stats?.totalStudents ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">生徒数</p>
             </div>
-            <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
               <p className="text-3xl font-bold text-[#E67E22]">
                 {loading ? "—" : stats?.avgScore ?? 0}
               </p>
@@ -216,8 +216,8 @@ export default function DashboardPage() {
 
   // ===== Student (user) Dashboard =====
   return (
-    <div className="min-h-screen bg-[#FFFFFF]">
-      <div className="border-b border-[#E3E2DE] py-10">
+    <div className="min-h-screen">
+      <div className="bg-white border-b border-[#E3E2DE] py-10">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
             AIライティング添削
@@ -239,13 +239,13 @@ export default function DashboardPage() {
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
             <p className="text-3xl font-bold text-[#6C5CE7]">
               {loading ? "—" : stats?.totalCorrections ?? 0}
             </p>
             <p className="text-sm text-[#6B6B6B] mt-1">添削件数</p>
           </div>
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 text-center">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 text-center">
             <p className="text-3xl font-bold text-[#E67E22]">
               {loading ? "—" : stats?.avgScore ?? 0}
             </p>
@@ -277,7 +277,7 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#37352F]">添削履歴</p>
             <p className="text-xs text-[#6B6B6B] mt-1">過去の添削結果を確認</p>
           </Link>
-          <Link href="/guide" className="bg-[#F7F6F3] rounded-xl p-5 hover:opacity-80 transition-opacity">
+          <Link href="/guide" className="bg-white border border-[#E3E2DE] rounded-xl p-5 hover:opacity-80 transition-opacity">
             <p className="text-sm font-semibold text-[#37352F]">操作ガイド</p>
             <p className="text-xs text-[#6B6B6B] mt-1">使い方を確認</p>
           </Link>
@@ -305,7 +305,7 @@ function RecentCorrectionsList({
   linkAll: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-semibold text-[#37352F]">最近の添削</h2>
         <Link href={linkAll} className="text-sm text-[#2383E2] hover:underline">

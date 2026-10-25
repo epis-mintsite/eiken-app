@@ -97,7 +97,7 @@ export default function ExportButtons({ data }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">レポート出力</h2>
       <div className="flex gap-3 flex-wrap">
         <button

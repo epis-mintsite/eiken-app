@@ -126,7 +126,7 @@ export default function BatchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-8 py-12 space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">一括添削処理</h1>
@@ -136,7 +136,7 @@ export default function BatchPage() {
         </div>
 
         {/* Shared topic */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <label className="block text-sm font-medium text-[#37352F] mb-2">
             共通TOPIC（個別に設定しない場合に使用）
           </label>
@@ -182,7 +182,7 @@ export default function BatchPage() {
               )}
             </div>
 
-            <div className="bg-white rounded-xl border border-[#E3E2DE] divide-y divide-[#EEEEEC]">
+            <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm divide-y divide-[#EEEEEC]">
               {items.map((item, i) => (
                 <div key={i} className="p-4">
                   <div className="flex items-start gap-3">

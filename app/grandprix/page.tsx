@@ -245,7 +245,7 @@ export default function GrandprixPage() {
     "w-full rounded-lg border border-[#E3E2DE] px-3 py-2 text-sm focus:outline-none focus:border-[#1F4E79] disabled:bg-[#F7F7F5]";
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-8">
         <div className="mb-8">
           <p className="text-sm font-medium" style={{ color: ACCENT }}>{GP_TITLE}</p>

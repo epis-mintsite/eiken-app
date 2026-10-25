@@ -8,7 +8,7 @@ export default function GoodPoints({ points }: Props) {
   if (!points || points.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">良かった点</h2>
       <ul className="space-y-3">
         {points.map((point, i) => (

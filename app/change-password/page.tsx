@@ -55,7 +55,7 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] flex items-start justify-center pt-20 px-4">
+    <div className="min-h-screen flex items-start justify-center pt-20 px-4">
       <div className="w-full max-w-md">
         <h1 className="text-2xl font-semibold text-[#37352F] mb-8">
           パスワード変更

@@ -113,7 +113,7 @@ export default function LoginPage() {
   const isEpis = mode === "epis";
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center py-8">
+    <div className="min-h-screen flex items-center justify-center py-8">
       <div className="w-full max-w-sm mx-4">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">
@@ -124,7 +124,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-8">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#37352F] mb-1.5">

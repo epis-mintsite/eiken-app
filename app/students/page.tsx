@@ -75,7 +75,7 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-8 py-12 space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">生徒管理</h1>
@@ -83,7 +83,7 @@ export default function StudentsPage() {
         </div>
 
         {/* Add form */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <h2 className="text-lg font-semibold text-[#37352F] mb-4">生徒を登録</h2>
           <form onSubmit={handleAdd} className="flex gap-3 flex-wrap">
             <input
@@ -112,7 +112,7 @@ export default function StudentsPage() {
         </div>
 
         {/* Student list */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-8 text-center text-[#9B9A97]">
               <div className="animate-spin h-6 w-6 border-2 border-[#6C5CE7] border-t-transparent rounded-full mx-auto mb-2" />

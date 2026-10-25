@@ -139,7 +139,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-2xl mx-auto px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight text-[#37352F]">
@@ -153,7 +153,7 @@ export default function UploadPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <UploadDropzone file={file} onFileSelect={setFile} />
 
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-8 space-y-5">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-8 space-y-5">
             <div>
               <label className="block text-sm font-medium text-[#37352F] mb-1.5">
                 TOPIC <span className="text-[#EB5757]">*</span>

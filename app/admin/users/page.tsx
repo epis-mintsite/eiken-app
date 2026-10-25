@@ -204,7 +204,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-4xl mx-auto px-8">
         {/* Header */}
         <div className="mb-8">
@@ -259,7 +259,7 @@ export default function AdminUsersPage() {
             <div className="animate-spin h-8 w-8 border-4 border-[#6C5CE7] border-t-transparent rounded-full" />
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-[#E3E2DE] overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm overflow-hidden">
             {/* Desktop table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
@@ -439,7 +439,7 @@ export default function AdminUsersPage() {
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-xl border border-[#E3E2DE] shadow-lg w-full max-w-md mx-4 p-6"
+            className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm shadow-lg w-full max-w-md mx-4 p-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Add user modal */}

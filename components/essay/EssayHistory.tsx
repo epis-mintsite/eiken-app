@@ -61,7 +61,7 @@ export default function EssayHistory() {
         <span className="text-sm text-[#9B9A97]">{total}件</span>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#E3E2DE] overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm overflow-hidden">
         {loading ? (
           <p className="p-8 text-center text-sm text-[#9B9A97]">読み込み中...</p>
         ) : error ? (

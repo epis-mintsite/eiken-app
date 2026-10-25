@@ -13,7 +13,7 @@ const SECTIONS: { key: keyof Feedback; label: string; icon: string; borderColor:
 
 export default function FeedbackCard({ feedback }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">4観点別 講評</h2>
       <div className="space-y-4">
         {SECTIONS.map(({ key, label, icon, borderColor }) => (

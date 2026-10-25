@@ -34,7 +34,7 @@ export default function ScoreCard({ scores, wordCount }: Props) {
   const total = scores.content + scores.organization + scores.vocabulary + scores.grammar;
 
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6 space-y-4">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6 space-y-4">
       <div className="flex items-baseline justify-between">
         <h2 className="text-lg font-semibold text-[#37352F]">採点結果</h2>
         <div className="text-right">

@@ -114,7 +114,7 @@ export default function SummaryResultPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="animate-spin h-8 w-8 border-4 border-[#6C5CE7] border-t-transparent rounded-full mx-auto" />
           <p className="text-sm text-[#9B9A97]">結果を読み込み中...</p>
@@ -125,7 +125,7 @@ export default function SummaryResultPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-3">
           <p className="text-sm text-[#EB5757]">
             {error || "結果が見つかりません"}
@@ -142,7 +142,7 @@ export default function SummaryResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-3xl mx-auto px-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -166,7 +166,7 @@ export default function SummaryResultPage() {
         </div>
 
         {/* Student's answer */}
-        <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+        <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-[#37352F]">生徒の解答</h2>
             <span
@@ -190,7 +190,7 @@ export default function SummaryResultPage() {
 
         {/* Passage (collapsible) */}
         {data.passage_text && (
-          <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+          <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
             <button
               onClick={() => setShowPassage(!showPassage)}
               className="flex items-center justify-between w-full"

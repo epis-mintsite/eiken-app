@@ -12,7 +12,7 @@ const PRIORITY_STYLE: Record<string, { border: string; badge: string; label: str
 
 export default function AdviceList({ advice }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-[#E3E2DE] p-6">
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
       <h2 className="text-lg font-semibold text-[#37352F] mb-4">学習アドバイス</h2>
       <div className="space-y-3">
         {advice.map((item, i) => {
