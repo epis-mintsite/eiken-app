@@ -63,6 +63,8 @@ export default function GrandprixPage() {
   const [reading, setReading] = useState(false);
   const [transcribed, setTranscribed] = useState(false);
   const [photoNote, setPhotoNote] = useState("");
+  /** 写真から読み取れた欄（紙に書かれていなかった欄は今の入力をそのまま残す） */
+  const [readParts, setReadParts] = useState<{ title: boolean; summary: boolean; body: boolean } | null>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const pickerRef = useRef<HTMLInputElement>(null);
 
@@ -113,13 +115,16 @@ export default function GrandprixPage() {
   const summaryWords = useMemo(() => countWords(draft.summary), [draft.summary]);
   const format = useMemo(() => checkFormat(draft), [draft]);
   const tooLong = length > rule.bodyHardMax;
-  const illegible = countIllegible(draft.body);
-  const showBody = mode === "text" || transcribed;
+  const illegibleTitle = countIllegible(draft.title);
+  const illegibleSummary = countIllegible(draft.summary);
+  const illegibleBody = countIllegible(draft.body);
+  const illegible = illegibleTitle + illegibleSummary + illegibleBody;
+  const showFields = mode === "text" || transcribed;
   const busy = loading || reading;
   const closed = status !== null && !status.open;
   const usedUp = status?.limit != null && status.used >= status.limit;
   const required = !!(draft.knock.trim() && draft.title.trim() && draft.summary.trim() && draft.body.trim());
-  const canSubmit = required && showBody && !tooLong && illegible === 0 && !busy && !closed && !usedUp;
+  const canSubmit = required && showFields && !tooLong && illegible === 0 && !busy && !closed && !usedUp;
 
   function set<K extends keyof GPDraft>(key: K, value: GPDraft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -159,7 +164,15 @@ export default function GrandprixPage() {
       const res = await fetch("/api/grandprix/transcribe", { method: "POST", body: form });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || "読み取りに失敗しました");
-      set("body", body.text);
+      const read = { title: !!body.title, summary: !!body.summary, body: !!body.body };
+      setDraft((d) => ({
+        ...d,
+        title: read.title ? body.title : d.title,
+        summary: read.summary ? body.summary : d.summary,
+        body: read.body ? body.body : d.body,
+      }));
+      setShowGuide(false);
+      setReadParts(read);
       setPhotoNote(body.note || "");
       setTranscribed(true);
     } catch (err) {
@@ -174,6 +187,7 @@ export default function GrandprixPage() {
     setPhotos([]);
     setTranscribed(false);
     setPhotoNote("");
+    setReadParts(null);
   }
 
   async function readStream(res: Response) {
@@ -343,45 +357,10 @@ export default function GrandprixPage() {
           {/* タイトル・要旨・本文 */}
           <section className="space-y-4">
             <h2 className="text-sm font-semibold text-[#37352F]">③ タイトル・要旨・本文</h2>
-
-            <div className="space-y-1">
-              <label htmlFor="gp-title" className="text-xs font-semibold text-[#37352F]">
-                タイトル（{rule.titleLang === "ja" ? "日本語" : "英語"}）
-              </label>
-              <input
-                id="gp-title"
-                value={draft.title}
-                onChange={(e) => set("title", e.target.value)}
-                maxLength={200}
-                disabled={busy}
-                className={`${inputCls} ${draft.division === "GC" ? "font-serif" : ""}`}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between items-baseline gap-2">
-                <label htmlFor="gp-summary" className="text-xs font-semibold text-[#37352F]">
-                  要旨（英語・{SUMMARY_MAX_WORDS}語以内）
-                </label>
-                <span className={`text-xs ${summaryWords > SUMMARY_MAX_WORDS ? "text-[#C62828] font-semibold" : "text-[#9B9A97]"}`}>
-                  {summaryWords} / {SUMMARY_MAX_WORDS}語
-                </span>
-              </div>
-              <textarea
-                id="gp-summary"
-                value={draft.summary}
-                onChange={(e) => set("summary", e.target.value)}
-                rows={3}
-                maxLength={1500}
-                disabled={busy}
-                className={`${inputCls} font-serif leading-relaxed`}
-              />
-            </div>
-
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <span className="text-xs font-semibold text-[#37352F]">本文の入れ方</span>
-                <div className="inline-flex rounded-lg border border-[#E3E2DE] overflow-hidden text-sm" role="group" aria-label="本文の入れ方">
+                <span className="text-xs font-semibold text-[#37352F]">入れ方</span>
+                <div className="inline-flex rounded-lg border border-[#E3E2DE] overflow-hidden text-sm" role="group" aria-label="タイトル・要旨・本文の入れ方">
                   {([
                     ["text", "文字で入力"],
                     ["photo", "手書きの写真から"],
@@ -404,12 +383,13 @@ export default function GrandprixPage() {
               {mode === "photo" && !transcribed && (
                 <div className="rounded-xl border-2 border-dashed border-[#BFD3E6] p-4 space-y-3">
                   <p className="text-sm text-[#37352F]">
-                    手書きの本文を写真に撮ると、AIが文字に起こします。読み取った文章を確認してからチェックします（写真は保存しません）。
+                    手書きの下書きを写真に撮ると、AIがタイトル・要旨・本文に分けて文字に起こします。読み取った文章を確認してからチェックします（写真は保存しません）。
                   </p>
                   <ul className="text-xs text-[#6B6B6B] list-disc pl-5 space-y-0.5">
-                    <li>本文のところを、明るい場所で紙全体がまっすぐ入るように撮る</li>
+                    <li>明るい場所で、紙全体がまっすぐ入るように撮る</li>
                     <li>{MAX_ESSAY_PHOTOS}枚まで（2枚のときは1枚目から順に読みます）</li>
-                    <li>タイトルと要旨は上の欄に入力してください（写真からは本文だけを読みます）</li>
+                    <li>上から タイトル → 要旨 → 本文 の順に書くか、「タイトル」「要旨」の見出しを付けると、正しく分けられます</li>
+                    <li>紙に書いていない欄は、今入っている内容をそのまま残します</li>
                   </ul>
 
                   {photos.length > 0 && (
@@ -495,7 +475,7 @@ export default function GrandprixPage() {
                 <div className="rounded-xl bg-[#EEF4FA] p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <p className="text-sm text-[#37352F]">
-                      写真から読み取った本文です。<b>写真と見比べて、読みまちがいを直してから</b>チェックしてください。
+                      写真から読み取りました。<b>写真と見比べて、読みまちがいを直してから</b>チェックしてください。
                       自分で書いたまちがいは、そのまま残してください（チェックで直し方を教えてくれます）。
                     </p>
                     <button
@@ -507,6 +487,14 @@ export default function GrandprixPage() {
                       写真を撮り直す
                     </button>
                   </div>
+                  {readParts && (
+                    <p className="text-xs text-[#37352F]">
+                      読み取った欄：
+                      {(["title", "summary", "body"] as const)
+                        .map((k) => `${{ title: "タイトル", summary: "要旨", body: "本文" }[k]}${readParts[k] ? "" : "（紙になし・そのまま）"}`)
+                        .join("／")}
+                    </p>
+                  )}
                   {photoNote && <p className="text-xs text-[#8A5A00]">写真について: {photoNote}</p>}
                   <div className="flex gap-2 flex-wrap">
                     {photos.map((p, i) => (
@@ -521,7 +509,54 @@ export default function GrandprixPage() {
               )}
             </div>
 
-            {showBody && (
+
+            {showFields && (
+            <>
+
+            <div className="space-y-1">
+              <label htmlFor="gp-title" className="text-xs font-semibold text-[#37352F]">
+                タイトル（{rule.titleLang === "ja" ? "日本語" : "英語"}）
+              </label>
+              <input
+                id="gp-title"
+                value={draft.title}
+                onChange={(e) => set("title", e.target.value)}
+                maxLength={200}
+                disabled={busy}
+                className={`${inputCls} ${draft.division === "GC" ? "font-serif" : ""}`}
+              />
+              {illegibleTitle > 0 && (
+                <p className="text-xs text-[#C62828] font-semibold">
+                  タイトルに読み取れなかった文字（{ILLEGIBLE_MARK}）があります。写真を見て直してください。
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex justify-between items-baseline gap-2">
+                <label htmlFor="gp-summary" className="text-xs font-semibold text-[#37352F]">
+                  要旨（英語・{SUMMARY_MAX_WORDS}語以内）
+                </label>
+                <span className={`text-xs ${summaryWords > SUMMARY_MAX_WORDS ? "text-[#C62828] font-semibold" : "text-[#9B9A97]"}`}>
+                  {summaryWords} / {SUMMARY_MAX_WORDS}語
+                </span>
+              </div>
+              <textarea
+                id="gp-summary"
+                value={draft.summary}
+                onChange={(e) => set("summary", e.target.value)}
+                rows={3}
+                maxLength={1500}
+                disabled={busy}
+                className={`${inputCls} font-serif leading-relaxed`}
+              />
+              {illegibleSummary > 0 && (
+                <p className="text-xs text-[#C62828] font-semibold">
+                  要旨に読み取れなかった文字（{ILLEGIBLE_MARK}）があと{illegibleSummary}か所あります。写真を見て直してください。
+                </p>
+              )}
+            </div>
+
             <div className="space-y-1">
               <div className="flex justify-between items-baseline gap-2">
                 <label htmlFor="gp-body" className="text-xs font-semibold text-[#37352F]">
@@ -554,13 +589,14 @@ export default function GrandprixPage() {
                   {unit}まで）。
                 </p>
               )}
-              {illegible > 0 && (
+              {illegibleBody > 0 && (
                 <p className="text-xs text-[#C62828] font-semibold">
-                  読み取れなかった文字（{ILLEGIBLE_MARK}）があと{illegible}か所あります。写真を見て、正しい文字に直してください。
+                  読み取れなかった文字（{ILLEGIBLE_MARK}）があと{illegibleBody}か所あります。写真を見て、正しい文字に直してください。
                 </p>
               )}
               <p className="text-xs text-[#9B9A97]">数え方: {COUNTING_NOTE}</p>
             </div>
+            </>
             )}
           </section>
 

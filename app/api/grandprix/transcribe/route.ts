@@ -7,21 +7,18 @@ import { DIVISIONS } from "@/types/grandprix";
 import { DIVISION_RULES } from "@/lib/grandprix/rubric";
 import { bodyLength, unitLabel } from "@/lib/grandprix/format";
 import { checkGPAvailability } from "@/lib/grandprix/limits";
-import { transcribeEssayImages } from "@/lib/essay/transcribe";
+import { transcribeGPDraft } from "@/lib/grandprix/transcribe";
 import { MAX_ESSAY_PHOTOS } from "@/lib/essay/transcript-marks";
 
 export const maxDuration = 120;
-
-/** 書き起こしの指示（日本語の作文か英語のエッセイか）を部門に合わせる */
-const TRANSCRIBE_AS = { JC: "jp_essay", GC: "english_essay" } as const;
 
 function fail(status: number, error: string) {
   return NextResponse.json({ error }, { status });
 }
 
 /**
- * グランプリの下書き（本文）を手書きの写真（1〜2枚）から書き起こす。チェックはしない。
- * 仕組みはエッセイ添削の読み取りと同じ。写真は保存せず、ログにも本文を出さない。
+ * グランプリの下書きを手書きの写真（1〜2枚）から書き起こし、タイトル・要旨・本文に読み分ける。チェックはしない。
+ * 写真は保存せず、ログにも本文を出さない。
  * 読み取り自体は回数に数えないが、期間外や今日のチェックを使い切ったときは読まない。
  */
 export async function POST(request: NextRequest) {
@@ -52,18 +49,18 @@ export async function POST(request: NextRequest) {
         mediaType: file.type as MediaType,
       }))
     );
-    const transcript = await transcribeEssayImages(TRANSCRIBE_AS[division], images);
+    const transcript = await transcribeGPDraft(division, images);
 
-    if (!transcript.text) {
-      return fail(422, transcript.note || "写真から本文を読み取れませんでした。明るい場所で撮り直してください。");
+    if (!transcript.title && !transcript.summary && !transcript.body) {
+      return fail(422, transcript.note || "写真から文章を読み取れませんでした。明るい場所で撮り直してください。");
     }
-    const length = bodyLength(division, transcript.text);
+    const length = bodyLength(division, transcript.body);
     if (length > rule.bodyHardMax) {
       const unit = unitLabel(division);
       return fail(400, `読み取った本文が長すぎます（${length}${unit}）。${rule.bodyHardMax}${unit}までにしてください。`);
     }
 
-    return NextResponse.json({ text: transcript.text, note: transcript.note });
+    return NextResponse.json(transcript);
   } catch (error) {
     console.error("grandprix transcribe failed:", error instanceof Error ? error.name : "unknown");
     return fail(500, friendlyAIErrorMessage(error));

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   if (!summary) return fail(400, "要旨を入力してください");
   if (summary.length > MAX.summary) return fail(400, "要旨が長すぎます");
   if (!body) return fail(400, "本文を入力してください");
-  if (countIllegible(body) > 0) {
+  if (countIllegible(title) + countIllegible(summary) + countIllegible(body) > 0) {
     return fail(400, `読み取れなかった文字（${ILLEGIBLE_MARK}）が残っています。写真を見て直してください。`);
   }
   if (isTooShort(division, body)) {
