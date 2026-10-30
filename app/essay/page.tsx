@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import type { DocType } from "@/types/essay";
 import { DOC_TYPES } from "@/types/essay";
@@ -17,15 +17,30 @@ interface Photo {
   url: string;
 }
 
+// 予習ボードなど外から開かれたとき、URLの ?type=&prompt=&grade= を最初から入れておく。
+// 本文はURLで受け取らない（ログに残るため）。from=board なら「貼り付けてください」と案内する
 export default function EssayNewPage() {
+  return (
+    <Suspense fallback={null}>
+      <EssayForm />
+    </Suspense>
+  );
+}
+
+function EssayForm() {
   const router = useRouter();
+  const query = useSearchParams();
+  const fromBoard = query.get("from") === "board";
   const { user } = useAuth();
   const isStaff = user?.role === "teacher" || user?.role === "admin";
 
-  const [docType, setDocType] = useState<DocType | null>(null);
-  const [theme, setTheme] = useState("");
+  const [docType, setDocType] = useState<DocType | null>(() => {
+    const t = query.get("type");
+    return t && (DOC_TYPES as readonly string[]).includes(t) ? (t as DocType) : null;
+  });
+  const [theme, setTheme] = useState(() => (query.get("prompt") ?? "").slice(0, 500));
   const [text, setText] = useState("");
-  const [grade, setGrade] = useState("");
+  const [grade, setGrade] = useState(() => (query.get("grade") ?? "").slice(0, 20));
   const [studentName, setStudentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState("");
@@ -269,6 +284,11 @@ export default function EssayNewPage() {
               <section className="space-y-3">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <h2 className="text-sm font-semibold text-[#37352F]">③ 本文</h2>
+                  {fromBoard && mode === "text" && !text && (
+                    <p className="w-full text-sm rounded-lg bg-[#EEF4FA] px-3 py-2" style={{ color: ACCENT }}>
+                      予習ボードで書いた英文はコピーしてあります。下の欄に貼り付けてください。
+                    </p>
+                  )}
                   <div className="inline-flex rounded-lg border border-[#E3E2DE] overflow-hidden text-sm" role="group" aria-label="本文の入れ方">
                     {([
                       ["text", "文字で入力"],
