@@ -52,7 +52,6 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- スプラッシュのロゴ */}
         <img src="/epiq-logo.svg" alt="EPIQ" style={{ height: "56px", width: "auto", display: "block" }} />
-        <span style={{ fontSize: "13px", fontWeight: 500, color: "#9B9A97" }}>AIライティング添削</span>
       </div>
     </div>
   );
