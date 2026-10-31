@@ -185,7 +185,7 @@ export async function generatePdfReport(data: PdfInput): Promise<Buffer> {
     margins: { top: PAGE.margin, bottom: PAGE.margin, left: PAGE.margin, right: PAGE.margin },
     info: {
       Title: `添削レポート - ${data.student_name}`,
-      Author: "AIライティング添削",
+      Author: "EPIQ",
     },
   });
 
@@ -205,7 +205,7 @@ export async function generatePdfReport(data: PdfInput): Promise<Buffer> {
 
   // ---- Title ----
   doc.font("NotoSansBold").fontSize(18).fillColor(COLORS.dark)
-    .text(isSummary ? "AI要約添削レポート" : "AIライティング添削レポート", PAGE.margin, y);
+    .text(isSummary ? "AI要約添削レポート" : "EPIQ ライティング添削レポート", PAGE.margin, y);
   y += 28;
 
   // ---- Meta ----

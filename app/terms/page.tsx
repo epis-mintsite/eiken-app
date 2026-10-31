@@ -24,7 +24,7 @@ export default async function TermsPage() {
         <p className="mt-1 text-sm text-[#9B9A97]">
           {mode === "pre-login"
             ? "ご利用の前に、次の利用規約をお読みください。同意いただくとログイン画面に進めます。"
-            : "AIライティング添削の利用規約です。"}
+            : "EPIQ（AIライティング添削）の利用規約です。"}
           （版：{TERMS_VERSION}）
         </p>
 

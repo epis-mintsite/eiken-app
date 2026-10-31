@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AIライティング添削",
-  description: "手書き答案の写真をアップロードして自動添削・採点",
+  title: "EPIQ｜AIライティング添削",
+  description: "エピスのAIライティング添削アプリ。英作文・要約・エッセイ・グランプリの下書きを添削",
 };
 
 export default function RootLayout({

@@ -61,9 +61,9 @@ export default function Navigation() {
             href="/"
             className="flex items-center gap-2 shrink-0"
           >
-            <span className="text-[#37352F] font-semibold text-base tracking-tight">
-              AIライティング添削
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ロゴ（SVG） */}
+            <img src="/epiq-logo.svg" alt="EPIQ" className="h-7 w-auto" />
+            <span className="hidden sm:inline text-xs text-[#9B9A97] font-medium">AIライティング添削</span>
           </Link>
 
           {/* Center: Nav links (desktop) */}

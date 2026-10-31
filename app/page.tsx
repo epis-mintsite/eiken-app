@@ -60,11 +60,12 @@ export default function DashboardPage() {
       <div className="min-h-screen">
         <div className="bg-white border-b border-[#E3E2DE] py-10">
           <div className="max-w-4xl mx-auto px-4">
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-              AIライティング添削
+            <h1>
+              {/* eslint-disable-next-line @next/next/no-img-element -- ロゴ（SVG） */}
+              <img src="/epiq-logo.svg" alt="EPIQ" className="h-12 sm:h-14 w-auto" />
             </h1>
             <p className="mt-1 text-sm text-[#9B9A97]">
-              手書き答案の自動添削・採点システム（英検®準一級レベル対応）
+              AIライティング添削 ― 英作文・要約・エッセイの自動添削（英検®準一級レベル対応）
             </p>
           </div>
         </div>
@@ -129,11 +130,12 @@ export default function DashboardPage() {
       <div className="min-h-screen">
         <div className="bg-white border-b border-[#E3E2DE] py-10">
           <div className="max-w-3xl mx-auto px-4">
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-              AIライティング添削
+            <h1>
+              {/* eslint-disable-next-line @next/next/no-img-element -- ロゴ（SVG） */}
+              <img src="/epiq-logo.svg" alt="EPIQ" className="h-12 sm:h-14 w-auto" />
             </h1>
             <p className="mt-1 text-sm text-[#9B9A97]">
-              手書き答案の自動添削・採点システム（英検®準一級レベル対応）
+              AIライティング添削 ― 英作文・要約・エッセイの自動添削（英検®準一級レベル対応）
             </p>
             <div className="mt-6 flex items-center gap-3">
               <Link
@@ -219,11 +221,12 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <div className="bg-white border-b border-[#E3E2DE] py-10">
         <div className="max-w-3xl mx-auto px-4">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#37352F]">
-            AIライティング添削
+          <h1>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ロゴ（SVG） */}
+            <img src="/epiq-logo.svg" alt="EPIQ" className="h-12 sm:h-14 w-auto" />
           </h1>
           <p className="mt-1 text-sm text-[#9B9A97]">
-            手書き答案の自動添削・採点システム（英検®準一級レベル対応）
+            AIライティング添削 ― 英作文・要約・エッセイの自動添削（英検®準一級レベル対応）
           </p>
           <div className="mt-6">
             <Link

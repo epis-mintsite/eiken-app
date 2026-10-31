@@ -116,8 +116,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center py-8">
       <div className="w-full max-w-sm mx-4">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-[#37352F] tracking-tight">
-            AIライティング添削
+          <h1 className="flex flex-col items-center gap-1">
+            {/* eslint-disable-next-line @next/next/no-img-element -- ロゴ（SVG） */}
+            <img src="/epiq-logo.svg" alt="EPIQ" className="h-14 w-auto" />
+            <span className="text-sm font-medium text-[#6B6B6B]">AIライティング添削</span>
           </h1>
           <p className="text-sm text-[#9B9A97] mt-1">
             {isEpis ? "ミントサイトのIDとパスワードでログイン" : "管理者ログイン"}

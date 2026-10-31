@@ -133,7 +133,7 @@ export default function GuidePage() {
             操作ガイド
           </h1>
           <p className="mt-2 text-sm text-[#9B9A97]">
-            AIライティング添削アプリの使い方
+            EPIQ（AIライティング添削）の使い方
           </p>
         </div>
       </div>

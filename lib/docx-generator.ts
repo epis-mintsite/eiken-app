@@ -68,7 +68,7 @@ export async function generateDocx(data: DocxInput): Promise<Buffer> {
   // Title
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: "AIライティング添削レポート", bold: true, size: 32 })],
+      children: [new TextRun({ text: "EPIQ ライティング添削レポート", bold: true, size: 32 })],
       heading: HeadingLevel.HEADING_1,
       spacing: { after: 100 },
     })
@@ -283,7 +283,7 @@ export async function generateDocx(data: DocxInput): Promise<Buffer> {
     new Paragraph({
       children: [
         new TextRun({
-          text: "AIライティング添削アプリ — 自動生成レポート",
+          text: "EPIQ（AIライティング添削）— 自動生成レポート",
           size: 18,
           color: "9CA3AF",
         }),
