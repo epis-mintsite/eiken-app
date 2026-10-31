@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useAuth } from "@/components/AuthProvider";
 import { getFirebaseAuth } from "@/lib/firebase-client";
+import SplashScreen from "@/components/SplashScreen";
 
 type Mode = "epis" | "admin";
 
@@ -35,6 +36,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSplash, setShowSplash] = useState(true);
+  const [contentVisible, setContentVisible] = useState(false);
 
   function switchMode(next: Mode) {
     setMode(next);
@@ -113,7 +116,9 @@ export default function LoginPage() {
   const isEpis = mode === "epis";
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8">
+    <>
+    {showSplash && <SplashScreen onDone={() => { setShowSplash(false); setContentVisible(true); }} />}
+    <div className="min-h-screen flex items-center justify-center py-8" style={{ opacity: contentVisible ? 1 : 0, transition: "opacity 400ms ease" }}>
       <div className="w-full max-w-sm mx-4">
         <div className="text-center mb-8">
           <h1 className="flex flex-col items-center gap-1">
@@ -220,5 +225,6 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
