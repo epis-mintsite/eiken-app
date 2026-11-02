@@ -128,17 +128,17 @@ export default function DashboardPage() {
             </Link>
           </div>
 
+          {/* Recent grandprix checks */}
+          <RecentGrandprixList
+            loading={loading}
+            items={stats?.recentGrandprix || []}
+          />
+
           {/* Recent corrections */}
           <RecentCorrectionsList
             loading={loading}
             corrections={stats?.recentCorrections || []}
             linkAll="/corrections"
-          />
-
-          {/* Recent grandprix checks */}
-          <RecentGrandprixList
-            loading={loading}
-            items={stats?.recentGrandprix || []}
           />
         </div>
       </div>
@@ -226,17 +226,17 @@ export default function DashboardPage() {
             </Link>
           </div>
 
+          {/* Recent grandprix checks */}
+          <RecentGrandprixList
+            loading={loading}
+            items={stats?.recentGrandprix || []}
+          />
+
           {/* Recent corrections */}
           <RecentCorrectionsList
             loading={loading}
             corrections={stats?.recentCorrections || []}
             linkAll="/history"
-          />
-
-          {/* Recent grandprix checks */}
-          <RecentGrandprixList
-            loading={loading}
-            items={stats?.recentGrandprix || []}
           />
         </div>
       </div>
@@ -313,17 +313,17 @@ export default function DashboardPage() {
           </Link>
         </div>
 
+        {/* Recent grandprix checks */}
+        <RecentGrandprixList
+          loading={loading}
+          items={stats?.recentGrandprix || []}
+        />
+
         {/* Recent corrections */}
         <RecentCorrectionsList
           loading={loading}
           corrections={stats?.recentCorrections || []}
           linkAll="/history"
-        />
-
-        {/* Recent grandprix checks */}
-        <RecentGrandprixList
-          loading={loading}
-          items={stats?.recentGrandprix || []}
         />
       </div>
     </div>
