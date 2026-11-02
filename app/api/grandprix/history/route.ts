@@ -29,7 +29,17 @@ export async function GET(request: NextRequest) {
   const { data, error, count } = await query;
   if (error) {
     console.error("grandprix history failed:", error.code);
-    return NextResponse.json({ items: [], total: 0, error: "履歴を取得できませんでした" }, { status: 500 });
+    return NextResponse.json({ items: [], total: 0, totalStudents: 0, error: "履歴を取得できませんでした" }, { status: 500 });
   }
-  return NextResponse.json({ items: data ?? [], total: count ?? 0 });
+
+  // ユニーク生徒数（全件から集計）
+  let totalStudents = 0;
+  {
+    let sQuery = supabase.from("grandprix_checks").select("student_name");
+    if (!canViewAll(session)) sQuery = sQuery.eq("user_id", session.userId);
+    const { data: all } = await sQuery;
+    if (all) totalStudents = new Set(all.map((r) => r.student_name)).size;
+  }
+
+  return NextResponse.json({ items: data ?? [], total: count ?? 0, totalStudents });
 }

@@ -28,6 +28,8 @@ interface Stats {
   avgScore: number;
   recentCorrections: RecentCorrection[];
   recentGrandprix: GrandprixCheck[];
+  gpTotal: number;
+  gpStudents: number;
 }
 
 export default function DashboardPage() {
@@ -51,13 +53,15 @@ export default function DashboardPage() {
             (sum: number, c: { score_total: number }) => sum + (c.score_total || 0),
             0
           );
-          const gpData = gpRes.ok ? await gpRes.json() : { items: [] };
+          const gpData = gpRes.ok ? await gpRes.json() : { items: [], total: 0, totalStudents: 0 };
           setStats({
             totalCorrections: data.total || corrections.length,
             totalStudents: students.size,
             avgScore: corrections.length > 0 ? Math.round((totalScore / corrections.length) * 10) / 10 : 0,
             recentCorrections: corrections.slice(0, 5),
             recentGrandprix: (gpData.items || []).slice(0, 5),
+            gpTotal: gpData.total || 0,
+            gpStudents: gpData.totalStudents || 0,
           });
         }
       } catch {
@@ -105,6 +109,20 @@ export default function DashboardPage() {
                 {loading ? "—" : stats?.avgScore ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">平均スコア / 16</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#FFF6E5] rounded-xl border border-[#F2D9A6] shadow-sm p-6 text-center">
+              <p className="text-3xl font-bold text-[#8A5A00]">
+                {loading ? "—" : stats?.gpTotal ?? 0}
+              </p>
+              <p className="text-sm text-[#6B6B6B] mt-1">GPチェック数</p>
+            </div>
+            <div className="bg-[#FFF6E5] rounded-xl border border-[#F2D9A6] shadow-sm p-6 text-center">
+              <p className="text-3xl font-bold text-[#8A5A00]">
+                {loading ? "—" : stats?.gpStudents ?? 0}
+              </p>
+              <p className="text-sm text-[#6B6B6B] mt-1">GP利用生徒数</p>
             </div>
           </div>
 
@@ -195,6 +213,20 @@ export default function DashboardPage() {
                 {loading ? "—" : stats?.avgScore ?? 0}
               </p>
               <p className="text-sm text-[#6B6B6B] mt-1">平均スコア / 16</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#FFF6E5] rounded-xl border border-[#F2D9A6] shadow-sm p-6 text-center">
+              <p className="text-3xl font-bold text-[#8A5A00]">
+                {loading ? "—" : stats?.gpTotal ?? 0}
+              </p>
+              <p className="text-sm text-[#6B6B6B] mt-1">GPチェック数</p>
+            </div>
+            <div className="bg-[#FFF6E5] rounded-xl border border-[#F2D9A6] shadow-sm p-6 text-center">
+              <p className="text-3xl font-bold text-[#8A5A00]">
+                {loading ? "—" : stats?.gpStudents ?? 0}
+              </p>
+              <p className="text-sm text-[#6B6B6B] mt-1">GP利用生徒数</p>
             </div>
           </div>
 
