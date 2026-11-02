@@ -13,11 +13,21 @@ interface RecentCorrection {
   corrected_at: string;
 }
 
+interface GrandprixCheck {
+  id: string;
+  division: string;
+  student_name: string;
+  title: string;
+  knock: string;
+  created_at: string;
+}
+
 interface Stats {
   totalCorrections: number;
   totalStudents: number;
   avgScore: number;
   recentCorrections: RecentCorrection[];
+  recentGrandprix: GrandprixCheck[];
 }
 
 export default function DashboardPage() {
@@ -29,20 +39,25 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/history?limit=5");
-        if (res.ok) {
-          const data = await res.json();
+        const [histRes, gpRes] = await Promise.all([
+          fetch("/api/history?limit=5"),
+          fetch("/api/grandprix/history?limit=5"),
+        ]);
+        if (histRes.ok) {
+          const data = await histRes.json();
           const corrections = data.corrections || [];
           const students = new Set(corrections.map((c: { student_name: string }) => c.student_name));
           const totalScore = corrections.reduce(
             (sum: number, c: { score_total: number }) => sum + (c.score_total || 0),
             0
           );
+          const gpData = gpRes.ok ? await gpRes.json() : { items: [] };
           setStats({
             totalCorrections: data.total || corrections.length,
             totalStudents: students.size,
             avgScore: corrections.length > 0 ? Math.round((totalScore / corrections.length) * 10) / 10 : 0,
             recentCorrections: corrections.slice(0, 5),
+            recentGrandprix: (gpData.items || []).slice(0, 5),
           });
         }
       } catch {
@@ -118,6 +133,12 @@ export default function DashboardPage() {
             loading={loading}
             corrections={stats?.recentCorrections || []}
             linkAll="/corrections"
+          />
+
+          {/* Recent grandprix checks */}
+          <RecentGrandprixList
+            loading={loading}
+            items={stats?.recentGrandprix || []}
           />
         </div>
       </div>
@@ -211,6 +232,12 @@ export default function DashboardPage() {
             corrections={stats?.recentCorrections || []}
             linkAll="/history"
           />
+
+          {/* Recent grandprix checks */}
+          <RecentGrandprixList
+            loading={loading}
+            items={stats?.recentGrandprix || []}
+          />
         </div>
       </div>
     );
@@ -292,6 +319,12 @@ export default function DashboardPage() {
           corrections={stats?.recentCorrections || []}
           linkAll="/history"
         />
+
+        {/* Recent grandprix checks */}
+        <RecentGrandprixList
+          loading={loading}
+          items={stats?.recentGrandprix || []}
+        />
       </div>
     </div>
   );
@@ -347,6 +380,52 @@ function RecentCorrectionsList({
       ) : (
         <div className="text-center py-10">
           <p className="text-sm text-[#6B6B6B]">まだ添削データがありません</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RecentGrandprixList({
+  loading,
+  items,
+}: {
+  loading: boolean;
+  items: GrandprixCheck[];
+}) {
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-xl border border-[#E3E2DE] shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-semibold text-[#37352F]">最近のグランプリチェック</h2>
+      </div>
+      {loading ? (
+        <p className="text-[#6B6B6B] text-sm">読み込み中...</p>
+      ) : (
+        <div>
+          {items.map((item, i) => (
+            <Link
+              key={item.id}
+              href={`/grandprix/result/${item.id}`}
+              className={`flex items-center justify-between py-3 hover:bg-[#F7F6F3] -mx-2 px-2 rounded-md transition-colors ${
+                i < items.length - 1 ? "border-b border-[#EEEEEC]" : ""
+              }`}
+            >
+              <div>
+                <p className="text-sm font-medium text-[#37352F]">{item.student_name}</p>
+                <p className="text-xs text-[#6B6B6B] truncate max-w-[250px]">{item.title}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-medium text-[#8A5A00] bg-[#FFF6E5] rounded px-1.5 py-0.5 inline-block">
+                  {item.division}
+                </p>
+                <p className="text-xs text-[#6B6B6B] mt-0.5">
+                  {new Date(item.created_at).toLocaleDateString("ja-JP")}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </div>
