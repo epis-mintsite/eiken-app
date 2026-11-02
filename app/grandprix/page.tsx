@@ -211,6 +211,7 @@ export default function GrandprixPage() {
           if (eventType === "error") throw new Error(data.message);
           if (eventType === "result") {
             sessionStorage.setItem("gpResult", JSON.stringify(data));
+            try { localStorage.removeItem(draftKey(user?.id)); } catch {}
             router.push(data.id ? `/grandprix/result/${data.id}` : "/grandprix/result/local");
             return;
           }
