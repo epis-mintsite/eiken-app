@@ -78,6 +78,15 @@ export default function GrandprixPage() {
   // 下書きの復元（結果画面から戻ったとき → この端末に残っている下書き の順）
   useEffect(() => {
     if (!user) return;
+    // チェック成功後に戻ってきた場合は下書きを復元しない
+    try {
+      if (sessionStorage.getItem("gp-checked")) {
+        sessionStorage.removeItem("gp-checked");
+        localStorage.removeItem(draftKey(user.id));
+        setRestored(true);
+        return;
+      }
+    } catch {}
     let next: GPDraft | null = null;
     try {
       next = parseDraft(sessionStorage.getItem(GP_RESTORE_KEY));
@@ -211,7 +220,10 @@ export default function GrandprixPage() {
           if (eventType === "error") throw new Error(data.message);
           if (eventType === "result") {
             sessionStorage.setItem("gpResult", JSON.stringify(data));
-            try { localStorage.removeItem(draftKey(user?.id)); } catch {}
+            try {
+              localStorage.removeItem(draftKey(user?.id));
+              sessionStorage.setItem("gp-checked", "1");
+            } catch {}
             router.push(data.id ? `/grandprix/result/${data.id}` : "/grandprix/result/local");
             return;
           }
