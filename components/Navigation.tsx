@@ -8,11 +8,13 @@ import { useAuth } from "@/components/AuthProvider";
 const NAV_ITEMS_COMMON = [
   { href: "/", label: "ダッシュボード" },
   { href: "/history", label: "履歴" },
+  { href: "/exam-results", label: "演習結果" },
   { href: "/guide", label: "ガイド" },
 ];
 
 const NAV_ITEMS_ADMIN = [
   { href: "/", label: "ダッシュボード" },
+  { href: "/exam-results", label: "演習結果" },
   { href: "/settings", label: "設定" },
 ];
 
@@ -20,6 +22,7 @@ const NAV_ITEMS_TEACHER = [
   { href: "/", label: "ダッシュボード" },
   { href: "/batch", label: "一括処理" },
   { href: "/history", label: "履歴" },
+  { href: "/exam-results", label: "演習結果" },
   { href: "/settings", label: "設定" },
 ];
 

@@ -15,7 +15,8 @@ import { verifyTermsCookie } from "@/lib/terms-cookie";
 
 // 常に通すパス（規約ページ・同意API・Vercel Cronのヘルスチェック）
 // （/api/auth/logout は、再同意が必要な状態でもログアウトできるように通す）
-const alwaysPublic = ["/terms", "/api/terms", "/api/health", "/api/auth/logout"];
+// （/exam-results/import は解答解説ボードからの受け口。画面は URL の結果を預かるだけで、記録APIはログイン必須のまま）
+const alwaysPublic = ["/terms", "/api/terms", "/api/health", "/api/auth/logout", "/exam-results/import"];
 // 規約に同意済み（Cookie）なら未ログインでも開けるパス
 // （/api/auth/demo-login は手元専用。Vercel 上ではルート自体が 404 を返す）
 const loginPaths = ["/login", "/api/auth/login", "/api/auth/epis-login", "/api/auth/demo-login"];

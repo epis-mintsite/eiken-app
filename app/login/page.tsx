@@ -6,6 +6,16 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useAuth } from "@/components/AuthProvider";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import SplashScreen from "@/components/SplashScreen";
+import { PENDING_KEY } from "@/lib/exam-results/catalog";
+
+/** 解答解説ボードから届いた演習結果が、ログイン待ちで預けられているか */
+function hasPendingExamResult(): boolean {
+  try {
+    return !!localStorage.getItem(PENDING_KEY);
+  } catch {
+    return false;
+  }
+}
 
 type Mode = "epis" | "admin";
 
@@ -78,7 +88,7 @@ export default function LoginPage() {
       } else {
         await login(loginId, password);
       }
-      router.push("/");
+      router.push(hasPendingExamResult() ? "/exam-results/import" : "/");
     } catch (err) {
       // 規約への同意の有効期限（24時間）が切れた場合は、規約ページへ戻す
       const code = (err as { code?: string }).code;
