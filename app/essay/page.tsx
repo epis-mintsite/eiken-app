@@ -163,6 +163,16 @@ function EssayForm() {
     setError("");
     setProgress("送信しています...");
     try {
+      let strictness = "standard";
+      let customInstructions = "";
+      try {
+        const stored = localStorage.getItem("eikenSettings");
+        if (stored) {
+          const s = JSON.parse(stored);
+          if (s.strictness) strictness = s.strictness;
+          if (s.customInstructions) customInstructions = s.customInstructions;
+        }
+      } catch { /* skip */ }
       const res = await fetch("/api/essay/correct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,6 +183,8 @@ function EssayForm() {
           grade,
           studentName,
           sourceType: mode === "photo" && transcribed ? "image" : "text",
+          strictness,
+          customInstructions,
         }),
       });
       if (!res.ok) {

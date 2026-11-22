@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
   const grade = typeof body.grade === "string" ? body.grade.trim().slice(0, MAX_GRADE_CHARS) : "";
   // 写真から読み取り、本人が確認した本文かどうか（記録用）
   const sourceType: "text" | "image" = body.sourceType === "image" ? "image" : "text";
+  const strictness = typeof body.strictness === "string" ? body.strictness : "standard";
+  const customInstructions = typeof body.customInstructions === "string" ? body.customInstructions : "";
   // 生徒の氏名はセッションから決める（講師・管理者は代理提出のため入力値を使う）
   const inputName = typeof body.studentName === "string" ? body.studentName.trim() : "";
   const studentName = canViewAll(session)
@@ -90,6 +92,8 @@ export async function POST(request: NextRequest) {
           grade,
           text,
           fromPhoto: sourceType === "image",
+          strictness,
+          customInstructions,
         });
 
         send("status", { message: "結果を保存しています..." });

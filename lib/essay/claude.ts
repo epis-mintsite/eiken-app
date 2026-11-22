@@ -29,6 +29,8 @@ export async function generateEssayFeedback(params: {
   text: string;
   /** 手書きの写真から読み取り、本人が確認した本文か */
   fromPhoto?: boolean;
+  strictness?: string;
+  customInstructions?: string;
 }): Promise<{ feedback: EssayFeedback; model: string }> {
   const request = {
     model: essayModel(),
@@ -43,7 +45,10 @@ export async function generateEssayFeedback(params: {
     system: [
       {
         type: "text",
-        text: buildEssaySystemPrompt(params.docType),
+        text: buildEssaySystemPrompt(params.docType, {
+          strictness: params.strictness,
+          customInstructions: params.customInstructions,
+        }),
         cache_control: { type: "ephemeral" },
       },
     ],
