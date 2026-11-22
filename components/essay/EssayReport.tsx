@@ -1,4 +1,4 @@
-import type { EssayRecord, Rating } from "@/types/essay";
+import type { EssayRecord, Rating, Strength, VocabUpgrade, UsefulPattern } from "@/types/essay";
 import { DOC_TYPE_CONFIG } from "@/lib/essay/rubrics";
 
 /**
@@ -114,6 +114,35 @@ export default function EssayReport({ record }: { record: EssayRecord }) {
         </div>
       </section>
 
+      {/* 2.5 この答案の強み */}
+      {feedback.strengths && feedback.strengths.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="flex items-center gap-3 text-lg font-semibold mb-4 pb-2 border-b-2"
+            style={{ color: "#2E7D32", borderColor: "#2E7D32" }}
+          >
+            <span
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-sm shrink-0"
+              style={{ backgroundColor: "#2E7D32" }}
+            >
+              ★
+            </span>
+            この答案の強み
+          </h2>
+          <div className="space-y-3">
+            {feedback.strengths.map((s, i) => (
+              <div key={i} className="border border-[#B7DFC2] bg-[#F0F9F2] rounded-lg p-4 break-inside-avoid">
+                <p className="font-semibold text-[#1E7B34] mb-2">{s.point}</p>
+                <p className={`text-sm border-l-3 border-[#2E7D32] pl-3 mb-2 ${isEnglish ? "font-serif" : ""}`}>
+                  「{s.quote}」
+                </p>
+                <p className="text-sm text-[#4A4A4A]">{s.reason}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* 3. 添削ポイント */}
       <section className="mb-10">
         <SectionTitle num={3}>添削ポイント</SectionTitle>
@@ -141,6 +170,43 @@ export default function EssayReport({ record }: { record: EssayRecord }) {
         </ol>
       </section>
 
+      {/* 3.5 語彙アップグレード */}
+      {feedback.vocabUpgrades && feedback.vocabUpgrades.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="flex items-center gap-3 text-lg font-semibold mb-4 pb-2 border-b-2"
+            style={{ color: "#7B1FA2", borderColor: "#7B1FA2" }}
+          >
+            <span
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-sm shrink-0"
+              style={{ backgroundColor: "#7B1FA2" }}
+            >
+              ↑
+            </span>
+            語彙アップグレード
+          </h2>
+          <div className="border border-[#D9D9D9] rounded-lg overflow-hidden">
+            {feedback.vocabUpgrades.map((v, i) => (
+              <div key={i} className={`p-4 break-inside-avoid ${i > 0 ? "border-t border-[#E5E5E5]" : ""}`}>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span className={`bg-[#FFF3E8] text-[#E67E22] px-2 py-0.5 rounded text-sm font-medium ${isEnglish ? "font-serif" : ""}`}>
+                    {v.original}
+                  </span>
+                  <span className="text-[#9B9A97]">→</span>
+                  <span className={`bg-[#F3E5F5] text-[#7B1FA2] px-2 py-0.5 rounded text-sm font-bold ${isEnglish ? "font-serif" : ""}`}>
+                    {v.upgrade}
+                  </span>
+                </div>
+                <p className={`text-sm text-[#4A4A4A] mb-1 ${isEnglish ? "font-serif" : ""}`}>
+                  <span className="text-xs text-[#6B6B6B] mr-1">例文:</span>{v.example}
+                </p>
+                <p className="text-xs text-[#6B6B6B]">{v.why}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* 4. 模範解答 */}
       <section className="mb-10">
         <SectionTitle num={4}>模範解答（書き直し例）</SectionTitle>
@@ -160,6 +226,37 @@ export default function EssayReport({ record }: { record: EssayRecord }) {
           ))}
         </div>
       </section>
+
+      {/* 4.5 使える表現パターン集 */}
+      {feedback.usefulPatterns && feedback.usefulPatterns.length > 0 && (
+        <section className="mb-10">
+          <h2
+            className="flex items-center gap-3 text-lg font-semibold mb-4 pb-2 border-b-2"
+            style={{ color: "#0277BD", borderColor: "#0277BD" }}
+          >
+            <span
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-sm shrink-0"
+              style={{ backgroundColor: "#0277BD" }}
+            >
+              ✎
+            </span>
+            使える表現パターン集
+          </h2>
+          <div className="space-y-3">
+            {feedback.usefulPatterns.map((p, i) => (
+              <div key={i} className="border border-[#B3D9EA] bg-[#E8F4FD] rounded-lg p-4 break-inside-avoid">
+                <p className="font-semibold text-[#0277BD] mb-2">{p.label}</p>
+                <p className={`text-sm bg-white rounded px-3 py-2 mb-2 border border-[#D0E8F2] font-medium ${isEnglish ? "font-serif" : ""}`}>
+                  {p.template}
+                </p>
+                <p className={`text-sm text-[#4A4A4A] ${isEnglish ? "font-serif" : ""}`}>
+                  <span className="text-xs text-[#6B6B6B] mr-1">使用例:</span>{p.example}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 5. アドバイス */}
       <section className="mb-10">
@@ -183,6 +280,28 @@ export default function EssayReport({ record }: { record: EssayRecord }) {
           ))}
         </div>
       </section>
+
+      {/* スコア予測 */}
+      {feedback.scoreEstimate && (
+        <section className="mb-10 break-inside-avoid">
+          <h2
+            className="flex items-center gap-3 text-lg font-semibold mb-4 pb-2 border-b-2"
+            style={{ color: "#E65100", borderColor: "#E65100" }}
+          >
+            <span
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-sm shrink-0"
+              style={{ backgroundColor: "#E65100" }}
+            >
+              📊
+            </span>
+            スコア予測
+          </h2>
+          <div className="bg-gradient-to-r from-[#FFF3E0] to-[#FBE9E7] border border-[#FFCC80] rounded-lg p-5">
+            <p className="text-2xl font-bold text-[#E65100] mb-2">{feedback.scoreEstimate.score}</p>
+            <p className="text-sm text-[#5D4037]">{feedback.scoreEstimate.note}</p>
+          </div>
+        </section>
+      )}
 
       {/* 締め */}
       <p
